@@ -69,7 +69,7 @@ async function cambiarEstado() {
     if (!nuevoEstado.value || nuevoEstado.value === requerimiento.value.estado) return
     cambiandoEstado.value = true
     try {
-        const r = await api.patch(`/requerimientos/${route.params.id}/estado`, { estado: nuevoEstado.value })
+        const r = await api.patch(`/requerimientos/${route.params.id}/estado`, { nuevo_estado: nuevoEstado.value })
         requerimiento.value = r.data
         nuevoEstado.value   = r.data.estado
         toast.add({ severity: 'success', summary: 'Estado actualizado', detail: estadoLabel(r.data.estado), life: 3000 })
