@@ -34,12 +34,11 @@ const TIPO_LABEL = {
 }
 
 const opcionesEstado = [
-    { label: 'Nuevo',          value: 'nuevo' },
-    { label: 'En análisis',    value: 'en_analisis' },
-    { label: 'En desarrollo',  value: 'en_desarrollo' },
-    { label: 'Resuelto',       value: 'resuelto' },
-    { label: 'Cerrado',        value: 'cerrado' },
-    { label: 'Rechazado',      value: 'rechazado' },
+    { label: 'En analisis',   value: 'En analisis' },
+    { label: 'En desarrollo', value: 'En desarrollo' },
+    { label: 'Resuelto',      value: 'Resuelto' },
+    { label: 'Cerrado',       value: 'Cerrado' },
+    { label: 'Rechazado',     value: 'Rechazado' },
 ]
 
 function formatFecha(f) {
