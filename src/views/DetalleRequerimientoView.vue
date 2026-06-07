@@ -56,7 +56,7 @@ async function cargar() {
     loading.value = true
     error.value   = null
     try {
-        const r = await api.get(`/requerimientos/${route.params.id}/`)
+        const r = await api.get(`/requerimientos/${route.params.id}`)
         requerimiento.value = r.data
         nuevoEstado.value   = r.data.estado
     } catch (err) {
@@ -73,7 +73,7 @@ async function cambiarEstado() {
     if (!nuevoEstado.value || nuevoEstado.value === requerimiento.value.estado) return
     cambiandoEstado.value = true
     try {
-        const r = await api.patch(`/requerimientos/${route.params.id}/estado/`, { nuevo_estado: nuevoEstado.value })
+        const r = await api.patch(`/requerimientos/${route.params.id}/estado`, { nuevo_estado: nuevoEstado.value })
         requerimiento.value = r.data
         nuevoEstado.value   = r.data.estado
         toast.add({ severity: 'success', summary: 'Estado actualizado', detail: estadoLabel(r.data.estado), life: 3000 })
@@ -96,7 +96,7 @@ function confirmarArchivar() {
         acceptClass: 'p-button-danger',
         accept: async () => {
             try {
-                await api.delete(`/requerimientos/${route.params.id}/`)
+                await api.delete(`/requerimientos/${route.params.id}`)
                 toast.add({ severity: 'success', summary: 'Archivado', detail: 'Requerimiento archivado correctamente', life: 2000 })
                 setTimeout(() => router.push('/dashboard'), 800)
             } catch {

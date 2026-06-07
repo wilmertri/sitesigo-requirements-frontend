@@ -55,7 +55,7 @@ async function crear() {
 
     loading.value = true
     try {
-        await api.post('/requerimientos/', {
+        await api.post('/requerimientos', {
             titulo:      titulo.value.trim(),
             descripcion: descripcion.value.trim(),
             tipo:        tipo.value,

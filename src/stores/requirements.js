@@ -17,7 +17,7 @@ export const useRequirementsStore = defineStore('requirements', () => {
             if (filtrosParam.tipo) params.tipo = filtrosParam.tipo
             if (filtrosParam.prioridad) params.prioridad = filtrosParam.prioridad
 
-            const response = await api.get('/requerimientos/', { params })
+            const response = await api.get('/requerimientos', { params })
             requerimientos.value = response.data
         } catch (err) {
             error.value = err.response?.data?.detail || 'Error al cargar requerimientos'
@@ -27,7 +27,7 @@ export const useRequirementsStore = defineStore('requirements', () => {
     }
 
     async function archivarRequerimiento(id) {
-        const response = await api.delete(`/requerimientos/${id}/`)
+        const response = await api.delete(`/requerimientos/${id}`)
         requerimientos.value = requerimientos.value.filter(r => r.id !== id)
         return response.data
     }
