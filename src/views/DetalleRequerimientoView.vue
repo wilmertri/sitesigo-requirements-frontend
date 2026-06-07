@@ -45,6 +45,10 @@ function formatFecha(f) {
     if (!f) return '—'
     return new Date(f).toLocaleDateString('es-CO', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })
 }
+function formatearFecha(fecha) {
+    if (!fecha) return 'Sin fecha'
+    return new Date(fecha).toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+}
 function tipoLabel(v) { return TIPO_LABEL[(v ?? '').toLowerCase()] ?? v }
 
 // ── Carga ──────────────────────────────────────────────────────────────────
@@ -170,11 +174,15 @@ onMounted(cargar)
             </div>
             <div>
               <p class="text-xs font-medium text-slate-400 uppercase tracking-wide mb-1">Autor</p>
-              <p class="text-sm text-slate-700">{{ requerimiento.autor || requerimiento.usuario?.nombre || requerimiento.usuario?.email || '—' }}</p>
+              <p class="text-sm text-slate-700">{{ requerimiento.autor_email || '—' }}</p>
             </div>
             <div>
+              <p class="text-xs font-medium text-slate-400 uppercase tracking-wide mb-1">Rol del autor</p>
+              <p class="text-sm text-slate-700 capitalize">{{ requerimiento.autor_rol || '—' }}</p>
+            </div>
+            <div class="col-span-2">
               <p class="text-xs font-medium text-slate-400 uppercase tracking-wide mb-1">Fecha de creación</p>
-              <p class="text-sm text-slate-700">{{ formatFecha(requerimiento.fecha_creacion) }}</p>
+              <p class="text-sm text-slate-700">{{ formatearFecha(requerimiento.creado_en) }}</p>
             </div>
           </div>
         </template>
