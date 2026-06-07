@@ -80,11 +80,10 @@ async function handleLogin() {
         >
           <i class="pi pi-shield" style="font-size: 1.75rem; color: #fff"></i>
         </div>
-        <h1 class="text-4xl font-black text-white tracking-widest">SITESIGO</h1>
+        <h1 class="text-4xl font-black text-white tracking-widest">ReqFlow</h1>
         <p class="text-blue-200 text-sm mt-1 font-medium tracking-wide">
-          Gestor de Requerimientos
+          Gestión de Requerimientos de Software
         </p>
-        <p class="text-blue-300 text-xs mt-0.5">Alcaldía de Chía · Colombia</p>
       </div>
 
       <!-- Card de login -->
