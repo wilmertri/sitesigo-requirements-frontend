@@ -28,26 +28,26 @@ const filtroTipo = ref(null)
 const filtroPrioridad = ref(null)
 
 const opcionesEstado = [
-    { label: 'Nuevo', value: 'nuevo' },
-    { label: 'En análisis', value: 'en_analisis' },
-    { label: 'En desarrollo', value: 'en_desarrollo' },
-    { label: 'Resuelto', value: 'resuelto' },
-    { label: 'Cerrado', value: 'cerrado' },
-    { label: 'Rechazado', value: 'rechazado' },
-    { label: 'Archivado', value: 'archivado' },
+    { label: 'Nuevo',          value: 'Nuevo' },
+    { label: 'En analisis',    value: 'En analisis' },
+    { label: 'En desarrollo',  value: 'En desarrollo' },
+    { label: 'Resuelto',       value: 'Resuelto' },
+    { label: 'Cerrado',        value: 'Cerrado' },
+    { label: 'Rechazado',      value: 'Rechazado' },
+    { label: 'Archivado',      value: 'Archivado' },
 ]
 
 const opcionesTipo = [
-    { label: 'Funcional', value: 'funcional' },
-    { label: 'No funcional', value: 'no_funcional' },
-    { label: 'Mejora', value: 'mejora' },
-    { label: 'Bug / Defecto', value: 'bug' },
+    { label: 'Bug',                   value: 'Bug' },
+    { label: 'Nueva funcionalidad',   value: 'Nueva funcionalidad' },
+    { label: 'Cambio en modulo',      value: 'Cambio en modulo' },
+    { label: 'Mejora UX/rendimiento', value: 'Mejora UX/rendimiento' },
 ]
 
 const opcionesPrioridad = [
-    { label: 'Alta', value: 'alta' },
-    { label: 'Media', value: 'media' },
-    { label: 'Baja', value: 'baja' },
+    { label: 'Alta',  value: 'Alta' },
+    { label: 'Media', value: 'Media' },
+    { label: 'Baja',  value: 'Baja' },
 ]
 
 function aplicarFiltros() {

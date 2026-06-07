@@ -27,16 +27,16 @@ const errorMsg    = ref('')
 const errors      = ref({})
 
 const opcionesTipo = [
-    { label: 'Bug / Defecto',           value: 'bug' },
-    { label: 'Nueva funcionalidad',     value: 'funcional' },
-    { label: 'Cambio en módulo',        value: 'no_funcional' },
-    { label: 'Mejora UX/rendimiento',   value: 'mejora' },
+    { label: 'Bug',                    value: 'Bug' },
+    { label: 'Nueva funcionalidad',    value: 'Nueva funcionalidad' },
+    { label: 'Cambio en modulo',       value: 'Cambio en modulo' },
+    { label: 'Mejora UX/rendimiento',  value: 'Mejora UX/rendimiento' },
 ]
 
 const opcionesPrioridad = [
-    { label: 'Alta',  value: 'alta' },
-    { label: 'Media', value: 'media' },
-    { label: 'Baja',  value: 'baja' },
+    { label: 'Alta',  value: 'Alta' },
+    { label: 'Media', value: 'Media' },
+    { label: 'Baja',  value: 'Baja' },
 ]
 
 function validate() {
