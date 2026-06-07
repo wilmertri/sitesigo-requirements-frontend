@@ -15,14 +15,14 @@ export const useAuthStore = defineStore('auth', () => {
         formData.append('username', email)
         formData.append('password', password)
 
-        const response = await api.post('/auth/token/', formData, {
+        const response = await api.post('/auth/token', formData, {
             headers: { 'Content-Type': 'multipart/form-data' }
         })
 
         token.value = response.data.access_token
         localStorage.setItem('jwt_token', token.value)
 
-        const meResponse = await api.get('/auth/me/')
+        const meResponse = await api.get('/auth/me')
         user.value = meResponse.data
         localStorage.setItem('user', JSON.stringify(user.value))
 
@@ -30,7 +30,7 @@ export const useAuthStore = defineStore('auth', () => {
     }
 
     async function registro(datos) {
-        const response = await api.post('/auth/registro/', datos)
+        const response = await api.post('/auth/registro', datos)
         return response.data
     }
 
