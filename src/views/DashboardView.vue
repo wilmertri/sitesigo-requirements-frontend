@@ -349,9 +349,9 @@ onMounted(() => req.cargarRequerimientos({}))
               </template>
             </Column>
 
-            <Column field="fecha_creacion" header="Fecha" style="width:9rem">
+            <Column field="creado_en" header="Fecha" style="width:9rem">
               <template #body="{ data }">
-                <span class="text-sm text-slate-500">{{ formatFecha(data.fecha_creacion) }}</span>
+                <span class="text-sm text-slate-500">{{ formatFecha(data.creado_en) }}</span>
               </template>
             </Column>
 
