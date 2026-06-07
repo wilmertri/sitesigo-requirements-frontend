@@ -49,15 +49,13 @@ const router = createRouter({
     routes
 })
 
-router.beforeEach((to, from, next) => {
+router.beforeEach((to) => {
     const auth = useAuthStore()
     if (to.meta.requiresAuth && !auth.isAuthenticated) {
-        next('/login')
-    } else if (!to.meta.requiresAuth && auth.isAuthenticated
-               && to.path !== '/registro') {
-        next('/dashboard')
-    } else {
-        next()
+        return '/login'
+    }
+    if (!to.meta.requiresAuth && auth.isAuthenticated && to.path !== '/registro') {
+        return '/dashboard'
     }
 })
 
