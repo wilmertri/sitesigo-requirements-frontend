@@ -17,6 +17,12 @@ body {
     font-family: 'Inter', sans-serif;
 }
 
+/* Clase aplicada al <main> en dark mode */
+.dark-bg-content {
+    background-color: #0f172a;
+    color: #e2e8f0;
+}
+
 /* ═══════════════════════════════════
    DARK MODE — Contraste bien definido
    ═══════════════════════════════════ */

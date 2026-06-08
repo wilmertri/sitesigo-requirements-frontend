@@ -4,6 +4,8 @@ import { useTransition, TransitionPresets } from '@vueuse/core'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { useRequirementsStore } from '../stores/requirements'
+import { useThemeStore } from '../stores/theme'
+import { useBadges } from '../composables/useBadges'
 import { useConfirm } from 'primevue/useconfirm'
 import { useToast } from 'primevue/usetoast'
 import AppLayout from '../components/AppLayout.vue'
@@ -16,11 +18,14 @@ import Toast from 'primevue/toast'
 import ConfirmDialog from 'primevue/confirmdialog'
 import Message from 'primevue/message'
 
-const router  = useRouter()
-const auth    = useAuthStore()
-const req     = useRequirementsStore()
-const confirm = useConfirm()
-const toast   = useToast()
+const router      = useRouter()
+const auth        = useAuthStore()
+const req         = useRequirementsStore()
+const confirm     = useConfirm()
+const toast       = useToast()
+const themeStore  = useThemeStore()
+const darkRef     = computed(() => themeStore.isDark)
+const { estadoLabel, estadoStyle, prioridadLabel, prioridadStyle } = useBadges(darkRef)
 
 // ── Filtros ───────────────────────────────────────────────────────────────────
 const filtroEstado    = ref(null)
@@ -88,30 +93,9 @@ function confirmarArchivar(requerimiento) {
     })
 }
 
-// ── Helpers de badge ──────────────────────────────────────────────────────────
-const ESTADO = {
-    nuevo:         { label: 'Nuevo',         bg: '#dbeafe', color: '#1e40af' },
-    en_analisis:   { label: 'En análisis',   bg: '#fef9c3', color: '#854d0e' },
-    en_desarrollo: { label: 'En desarrollo', bg: '#ffedd5', color: '#9a3412' },
-    resuelto:      { label: 'Resuelto',      bg: '#dcfce7', color: '#166534' },
-    cerrado:       { label: 'Cerrado',       bg: '#f3f4f6', color: '#6b7280' },
-    rechazado:     { label: 'Rechazado',     bg: '#fee2e2', color: '#991b1b' },
-    archivado:     { label: 'Archivado',     bg: '#d1d5db', color: '#374151' },
-}
-const PRIORIDAD = {
-    alta:  { label: 'Alta',  bg: '#fee2e2', color: '#991b1b' },
-    media: { label: 'Media', bg: '#fef9c3', color: '#854d0e' },
-    baja:  { label: 'Baja',  bg: '#dcfce7', color: '#166534' },
-}
-const DEFAULT_BADGE = { bg: '#f3f4f6', color: '#6b7280' }
-
-function normalize(v)     { return (v ?? '').toLowerCase().replace(/\s+/g, '_') }
-function estadoLabel(v)   { return ESTADO[normalize(v)]?.label ?? v }
-function estadoStyle(v)   { const e = ESTADO[normalize(v)] ?? DEFAULT_BADGE; return `background:${e.bg};color:${e.color}` }
-function prioridadLabel(v){ return PRIORIDAD[normalize(v)]?.label ?? v }
-function prioridadStyle(v){ const p = PRIORIDAD[normalize(v)] ?? DEFAULT_BADGE; return `background:${p.bg};color:${p.color}` }
-function tipoLabel(v)     { return v ?? '—' }
-function formatFecha(f)   {
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function tipoLabel(v)   { return v ?? '—' }
+function formatFecha(f) {
     if (!f) return '—'
     return new Date(f).toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' })
 }

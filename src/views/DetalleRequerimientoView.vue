@@ -2,6 +2,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
+import { useThemeStore } from '../stores/theme'
 import { useConfirm } from 'primevue/useconfirm'
 import { useToast } from 'primevue/usetoast'
 import { useBadges } from '../composables/useBadges'
@@ -14,12 +15,14 @@ import Message from 'primevue/message'
 import Toast from 'primevue/toast'
 import ConfirmDialog from 'primevue/confirmdialog'
 
-const router  = useRouter()
-const route   = useRoute()
-const auth    = useAuthStore()
-const confirm = useConfirm()
-const toast   = useToast()
-const { estadoLabel, estadoStyle, prioridadLabel, prioridadStyle } = useBadges()
+const router     = useRouter()
+const route      = useRoute()
+const auth       = useAuthStore()
+const confirm    = useConfirm()
+const toast      = useToast()
+const themeStore = useThemeStore()
+const darkRef    = computed(() => themeStore.isDark)
+const { estadoLabel, estadoStyle, prioridadLabel, prioridadStyle } = useBadges(darkRef)
 
 const requerimiento   = ref(null)
 const loading         = ref(true)
@@ -71,15 +74,17 @@ function formatFecha(f) {
 }
 
 const TIPO_COLOR = {
-    'bug':                  { bg: '#fee2e2', color: '#991b1b' },
-    'nueva funcionalidad':  { bg: '#dbeafe', color: '#1e40af' },
-    'cambio en modulo':     { bg: '#fef9c3', color: '#854d0e' },
-    'mejora ux/rendimiento':{ bg: '#f0fdf4', color: '#166534' },
+    'bug':                   { light: { bg: '#fee2e2', color: '#991b1b' }, dark: { bg: '#7f1d1d', color: '#fca5a5' } },
+    'nueva funcionalidad':   { light: { bg: '#dbeafe', color: '#1e40af' }, dark: { bg: '#1e3a5f', color: '#93c5fd' } },
+    'cambio en modulo':      { light: { bg: '#fef9c3', color: '#854d0e' }, dark: { bg: '#713f12', color: '#fde047' } },
+    'mejora ux/rendimiento': { light: { bg: '#f0fdf4', color: '#166534' }, dark: { bg: '#14532d', color: '#86efac' } },
 }
 
 function tipoStyle(v) {
-    const s = TIPO_COLOR[(v ?? '').toLowerCase()] ?? { bg: '#f3f4f6', color: '#6b7280' }
-    return `background:${s.bg};color:${s.color}`
+    const map = TIPO_COLOR[(v ?? '').toLowerCase()]
+    if (!map) return themeStore.isDark ? 'background:#1e293b;color:#94a3b8' : 'background:#f3f4f6;color:#6b7280'
+    const m = themeStore.isDark ? map.dark : map.light
+    return `background:${m.bg};color:${m.color}`
 }
 
 async function cargar() {

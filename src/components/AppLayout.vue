@@ -191,7 +191,10 @@ onUnmounted(() => window.removeEventListener('resize', onResize))
       </aside>
 
       <!-- ── Contenido (slot) ─────────────────────────────────── -->
-      <main class="flex-1 p-4 md:p-6 overflow-auto">
+      <main
+        class="flex-1 p-4 md:p-6 overflow-auto"
+        :class="themeStore.isDark ? 'dark-bg-content' : ''"
+      >
         <slot />
       </main>
     </div>
