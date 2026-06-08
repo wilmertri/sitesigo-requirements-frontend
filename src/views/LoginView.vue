@@ -60,7 +60,7 @@ async function handleLogin() {
       <div></div>
 
       <div class="flex flex-col items-center text-center">
-        <img src="@/assets/icon-reqflow.png" alt="ReqFlow" class="h-24 w-24 mb-8" />
+        <img src="@/assets/icon-reqflow.png" alt="ReqFlow" class="h-24 w-24 mb-8" style="border-radius:0;box-shadow:none" />
         <h1 class="text-4xl font-bold text-white mb-3">ReqFlow</h1>
         <p class="text-blue-300 text-lg mb-12">Gestión profesional de requerimientos de software</p>
 
@@ -156,7 +156,7 @@ async function handleLogin() {
               iconPos="right"
               fluid
               class="mt-1"
-              style="background:linear-gradient(135deg,#1e3a8a,#3b82f6);border:none"
+              style="background:linear-gradient(135deg,#1e3a8a,#3b82f6) !important;border:none !important"
             />
           </form>
         </div>
