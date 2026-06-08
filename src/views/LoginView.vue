@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { useThemeStore } from '../stores/theme'
@@ -22,9 +22,7 @@ const loading  = ref(false)
 const error    = ref('')
 const errors   = ref({ email: '', password: '' })
 
-watch([email, password], () => {
-    if (error.value) error.value = ''
-})
+function clearError() { if (error.value) error.value = '' }
 
 function validate() {
     errors.value = { email: '', password: '' }
@@ -121,6 +119,7 @@ async function handleLogin() {
                   fluid
                   :invalid="!!errors.email"
                   autocomplete="email"
+                  @input="clearError"
                 />
               </IconField>
               <small v-if="errors.email" class="text-red-500 text-xs flex items-center gap-1">
@@ -141,6 +140,7 @@ async function handleLogin() {
                 :invalid="!!errors.password"
                 placeholder="••••••••"
                 autocomplete="current-password"
+                @input="clearError"
               />
               <small v-if="errors.password" class="text-red-500 text-xs flex items-center gap-1">
                 <i class="pi pi-exclamation-circle text-xs"></i>{{ errors.password }}
