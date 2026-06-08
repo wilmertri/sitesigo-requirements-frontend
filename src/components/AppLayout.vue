@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import Button from 'primevue/button'
@@ -31,6 +31,12 @@ const navItems = computed(() => {
 
     return items
 })
+
+watch(
+    () => authStore.user,
+    () => { /* fuerza seguimiento de authStore.user como dependencia reactiva */ },
+    { immediate: true, deep: true }
+)
 
 function rolTag() {
     if (authStore.isSuperAdmin) return { value: 'Super Admin', severity: 'danger' }

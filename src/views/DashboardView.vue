@@ -1,30 +1,29 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { useRequirementsStore } from '../stores/requirements'
 import { useConfirm } from 'primevue/useconfirm'
 import { useToast } from 'primevue/usetoast'
+import AppLayout from '../components/AppLayout.vue'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import Select from 'primevue/select'
 import Button from 'primevue/button'
-import Tag from 'primevue/tag'
 import ProgressSpinner from 'primevue/progressspinner'
 import Toast from 'primevue/toast'
 import ConfirmDialog from 'primevue/confirmdialog'
 import Message from 'primevue/message'
 
-const router = useRouter()
-const route = useRoute()
-const auth = useAuthStore()
-const req = useRequirementsStore()
+const router  = useRouter()
+const auth    = useAuthStore()
+const req     = useRequirementsStore()
 const confirm = useConfirm()
-const toast = useToast()
+const toast   = useToast()
 
-// ── Filtros ──────────────────────────────────────────────────────────────────
-const filtroEstado = ref(null)
-const filtroTipo = ref(null)
+// ── Filtros ───────────────────────────────────────────────────────────────────
+const filtroEstado    = ref(null)
+const filtroTipo      = ref(null)
 const filtroPrioridad = ref(null)
 
 const opcionesEstado = [
@@ -52,41 +51,29 @@ const opcionesPrioridad = [
 
 function aplicarFiltros() {
     req.cargarRequerimientos({
-        estado: filtroEstado.value,
-        tipo: filtroTipo.value,
+        estado:    filtroEstado.value,
+        tipo:      filtroTipo.value,
         prioridad: filtroPrioridad.value,
     })
 }
 
 function limpiarFiltros() {
-    filtroEstado.value = null
-    filtroTipo.value = null
+    filtroEstado.value    = null
+    filtroTipo.value      = null
     filtroPrioridad.value = null
     req.cargarRequerimientos({})
 }
 
-// ── Navegación ────────────────────────────────────────────────────────────────
-const navItems = [
-    { label: 'Dashboard', icon: 'pi pi-home', path: '/dashboard' },
-    { label: 'Nuevo Requerimiento', icon: 'pi pi-plus-circle', path: '/requerimientos/nuevo' },
-    { label: 'Perfil', icon: 'pi pi-user', path: '/perfil' },
-]
-
-function handleLogout() {
-    auth.logout()
-    router.push('/login')
-}
-
-// ── Acciones de tabla ─────────────────────────────────────────────────────────
+// ── Acciones de tabla ──────────────────────────────────────────────────────────
 function navegarDetalle(event) {
     router.push(`/requerimientos/${event.data.id}`)
 }
 
 function confirmarArchivar(requerimiento) {
     confirm.require({
-        message: `¿Archivar el requerimiento #${requerimiento.id} — "${requerimiento.titulo}"?`,
-        header: 'Confirmar archivo',
-        icon: 'pi pi-inbox',
+        message:     `¿Archivar el requerimiento #${requerimiento.id} — "${requerimiento.titulo}"?`,
+        header:      'Confirmar archivo',
+        icon:        'pi pi-inbox',
         acceptLabel: 'Archivar',
         rejectLabel: 'Cancelar',
         accept: async () => {
@@ -100,288 +87,201 @@ function confirmarArchivar(requerimiento) {
     })
 }
 
-// ── Helpers de badge (inline styles — fiable en Tailwind v4) ─────────────────
+// ── Helpers de badge ──────────────────────────────────────────────────────────
 const ESTADO = {
-    nuevo:          { label: 'Nuevo',          bg: '#dbeafe', color: '#1e40af' },
-    en_analisis:    { label: 'En análisis',    bg: '#fef9c3', color: '#854d0e' },
-    en_desarrollo:  { label: 'En desarrollo',  bg: '#ffedd5', color: '#9a3412' },
-    resuelto:       { label: 'Resuelto',       bg: '#dcfce7', color: '#166534' },
-    cerrado:        { label: 'Cerrado',        bg: '#f3f4f6', color: '#6b7280' },
-    rechazado:      { label: 'Rechazado',      bg: '#fee2e2', color: '#991b1b' },
-    archivado:      { label: 'Archivado',      bg: '#d1d5db', color: '#374151' },
+    nuevo:         { label: 'Nuevo',         bg: '#dbeafe', color: '#1e40af' },
+    en_analisis:   { label: 'En análisis',   bg: '#fef9c3', color: '#854d0e' },
+    en_desarrollo: { label: 'En desarrollo', bg: '#ffedd5', color: '#9a3412' },
+    resuelto:      { label: 'Resuelto',      bg: '#dcfce7', color: '#166534' },
+    cerrado:       { label: 'Cerrado',       bg: '#f3f4f6', color: '#6b7280' },
+    rechazado:     { label: 'Rechazado',     bg: '#fee2e2', color: '#991b1b' },
+    archivado:     { label: 'Archivado',     bg: '#d1d5db', color: '#374151' },
 }
-
 const PRIORIDAD = {
     alta:  { label: 'Alta',  bg: '#fee2e2', color: '#991b1b' },
     media: { label: 'Media', bg: '#fef9c3', color: '#854d0e' },
     baja:  { label: 'Baja',  bg: '#dcfce7', color: '#166534' },
 }
-
-const TIPO = {
-    funcional:    'Funcional',
-    no_funcional: 'No funcional',
-    mejora:       'Mejora',
-    bug:          'Bug',
-}
-
 const DEFAULT_BADGE = { bg: '#f3f4f6', color: '#6b7280' }
 
-function normalize(v) { return (v ?? '').toLowerCase().replace(/\s+/g, '_') }
-
-function estadoLabel(v) { return ESTADO[normalize(v)]?.label ?? v }
-function estadoStyle(v) {
-    const e = ESTADO[normalize(v)] ?? DEFAULT_BADGE
-    return `background:${e.bg};color:${e.color}`
-}
-function prioridadLabel(v) { return PRIORIDAD[normalize(v)]?.label ?? v }
-function prioridadStyle(v) {
-    const p = PRIORIDAD[normalize(v)] ?? DEFAULT_BADGE
-    return `background:${p.bg};color:${p.color}`
-}
-function tipoLabel(v) { return TIPO[normalize(v)] ?? v }
-
-function formatFecha(fecha) {
-    if (!fecha) return '—'
-    return new Date(fecha).toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' })
+function normalize(v)     { return (v ?? '').toLowerCase().replace(/\s+/g, '_') }
+function estadoLabel(v)   { return ESTADO[normalize(v)]?.label ?? v }
+function estadoStyle(v)   { const e = ESTADO[normalize(v)] ?? DEFAULT_BADGE; return `background:${e.bg};color:${e.color}` }
+function prioridadLabel(v){ return PRIORIDAD[normalize(v)]?.label ?? v }
+function prioridadStyle(v){ const p = PRIORIDAD[normalize(v)] ?? DEFAULT_BADGE; return `background:${p.bg};color:${p.color}` }
+function tipoLabel(v)     { return v ?? '—' }
+function formatFecha(f)   {
+    if (!f) return '—'
+    return new Date(f).toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' })
 }
 
 onMounted(() => req.cargarRequerimientos({}))
 </script>
 
 <template>
-  <div class="min-h-screen flex flex-col" style="background:#f1f5f9">
+  <AppLayout>
     <Toast position="top-right" />
     <ConfirmDialog />
 
-    <!-- ── Header ────────────────────────────────────────────────── -->
-    <header
-      class="h-14 flex items-center justify-between px-6 shadow-md z-10 shrink-0"
-      style="background:#1e3a8a"
-    >
-      <!-- Logo -->
-      <div class="flex items-center gap-2">
-        <i class="pi pi-shield text-white text-lg"></i>
-        <span class="text-lg font-black tracking-widest text-white">ReqFlow</span>
+    <!-- Título + botón nuevo -->
+    <div class="flex items-start justify-between mb-5">
+      <div>
+        <h1 class="text-2xl font-bold text-slate-800">Requerimientos</h1>
+        <p class="text-sm text-slate-500 mt-0.5">
+          <template v-if="!req.loading">
+            {{ req.requerimientos.length }}
+            requerimiento{{ req.requerimientos.length !== 1 ? 's' : '' }}
+          </template>
+        </p>
       </div>
-
-      <!-- User + Logout -->
-      <div class="flex items-center gap-3">
-        <div class="flex items-center gap-2 text-sm" style="color:rgba(191,219,254,0.9)">
-          <i class="pi pi-user text-xs"></i>
-          <span>{{ auth.user?.nombre || auth.user?.email || 'Usuario' }}</span>
-          <Tag
-            v-if="auth.isAdmin"
-            value="Admin"
-            severity="warn"
-            class="text-xs py-0"
-          />
-        </div>
-        <Button
-          icon="pi pi-sign-out"
-          label="Salir"
-          text
-          size="small"
-          style="color:rgba(191,219,254,0.9)"
-          @click="handleLogout"
-        />
-      </div>
-    </header>
-
-    <div class="flex flex-1 min-h-0">
-      <!-- ── Sidebar ───────────────────────────────────────────────── -->
-      <aside class="w-52 shrink-0 flex flex-col pt-3" style="background:#172554">
-        <nav class="flex flex-col gap-0.5 px-2">
-          <RouterLink
-            v-for="item in navItems"
-            :key="item.path"
-            :to="item.path"
-            class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors"
-            :class="route.path === item.path
-              ? 'bg-blue-700 text-white'
-              : 'text-blue-300 hover:bg-blue-900 hover:text-white'"
-          >
-            <i :class="[item.icon, 'text-base w-4']"></i>
-            {{ item.label }}
-          </RouterLink>
-        </nav>
-      </aside>
-
-      <!-- ── Main ─────────────────────────────────────────────────── -->
-      <main class="flex-1 p-6 overflow-auto">
-
-        <!-- Título + botón nuevo -->
-        <div class="flex items-start justify-between mb-5">
-          <div>
-            <h1 class="text-2xl font-bold text-slate-800">Requerimientos</h1>
-            <p class="text-sm text-slate-500 mt-0.5">
-              <template v-if="!req.loading">
-                {{ req.requerimientos.length }}
-                requerimiento{{ req.requerimientos.length !== 1 ? 's' : '' }}
-              </template>
-            </p>
-          </div>
-          <Button
-            label="Nuevo Requerimiento"
-            icon="pi pi-plus"
-            @click="router.push('/requerimientos/nuevo')"
-          />
-        </div>
-
-        <!-- Barra de filtros -->
-        <div class="flex flex-wrap items-center gap-3 p-4 mb-5 bg-white rounded-xl shadow-sm border border-gray-100">
-          <Select
-            v-model="filtroEstado"
-            :options="opcionesEstado"
-            option-label="label"
-            option-value="value"
-            placeholder="Estado"
-            show-clear
-            class="w-44"
-            @change="aplicarFiltros"
-          />
-          <Select
-            v-model="filtroTipo"
-            :options="opcionesTipo"
-            option-label="label"
-            option-value="value"
-            placeholder="Tipo"
-            show-clear
-            class="w-44"
-            @change="aplicarFiltros"
-          />
-          <Select
-            v-model="filtroPrioridad"
-            :options="opcionesPrioridad"
-            option-label="label"
-            option-value="value"
-            placeholder="Prioridad"
-            show-clear
-            class="w-40"
-            @change="aplicarFiltros"
-          />
-          <Button
-            label="Limpiar filtros"
-            icon="pi pi-filter-slash"
-            text
-            severity="secondary"
-            size="small"
-            :disabled="!filtroEstado && !filtroTipo && !filtroPrioridad"
-            @click="limpiarFiltros"
-          />
-        </div>
-
-        <!-- Error del servidor -->
-        <Message v-if="req.error" severity="error" :closable="false" class="mb-4">
-          {{ req.error }}
-        </Message>
-
-        <!-- Loading inicial -->
-        <div v-if="req.loading" class="flex flex-col items-center justify-center py-24 gap-3">
-          <ProgressSpinner style="width:50px;height:50px" strokeWidth="4" />
-          <span class="text-sm text-slate-400">Cargando requerimientos…</span>
-        </div>
-
-        <!-- Tabla -->
-        <div v-else class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-          <DataTable
-            :value="req.requerimientos"
-            :rows="15"
-            :paginator="req.requerimientos.length > 15"
-            paginator-template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink"
-            :row-class="() => 'cursor-pointer hover:bg-blue-50 transition-colors'"
-            @row-click="navegarDetalle"
-          >
-            <!-- Estado vacío -->
-            <template #empty>
-              <div class="flex flex-col items-center py-16 text-slate-400">
-                <i class="pi pi-inbox text-6xl mb-4 text-slate-300"></i>
-                <p class="text-base font-medium text-slate-500">No hay requerimientos</p>
-                <p class="text-sm mt-1">
-                  {{ filtroEstado || filtroTipo || filtroPrioridad
-                    ? 'Prueba cambiando los filtros'
-                    : 'Crea el primero con el botón "Nuevo Requerimiento"' }}
-                </p>
-                <Button
-                  v-if="!filtroEstado && !filtroTipo && !filtroPrioridad"
-                  label="Nuevo Requerimiento"
-                  icon="pi pi-plus"
-                  size="small"
-                  class="mt-4"
-                  @click.stop="router.push('/requerimientos/nuevo')"
-                />
-              </div>
-            </template>
-
-            <!-- Columnas -->
-            <Column field="id" header="#" style="width:4rem;color:#64748b;font-size:0.8rem" />
-
-            <Column field="titulo" header="Título">
-              <template #body="{ data }">
-                <span class="font-medium text-slate-800">{{ data.titulo }}</span>
-              </template>
-            </Column>
-
-            <Column field="tipo" header="Tipo" style="width:9rem">
-              <template #body="{ data }">
-                <span class="text-sm text-slate-600">{{ tipoLabel(data.tipo) }}</span>
-              </template>
-            </Column>
-
-            <Column field="prioridad" header="Prioridad" style="width:8rem">
-              <template #body="{ data }">
-                <span
-                  class="px-2 py-0.5 rounded-full text-xs font-semibold"
-                  :style="prioridadStyle(data.prioridad)"
-                >
-                  {{ prioridadLabel(data.prioridad) }}
-                </span>
-              </template>
-            </Column>
-
-            <Column field="estado" header="Estado" style="width:10rem">
-              <template #body="{ data }">
-                <span
-                  class="px-2 py-0.5 rounded-full text-xs font-semibold"
-                  :style="estadoStyle(data.estado)"
-                >
-                  {{ estadoLabel(data.estado) }}
-                </span>
-              </template>
-            </Column>
-
-            <Column field="creado_en" header="Fecha" style="width:9rem">
-              <template #body="{ data }">
-                <span class="text-sm text-slate-500">{{ formatFecha(data.creado_en) }}</span>
-              </template>
-            </Column>
-
-            <Column header="Acciones" style="width:7rem">
-              <template #body="{ data }">
-                <div class="flex gap-1" @click.stop>
-                  <Button
-                    title="Ver detalle"
-                    icon="pi pi-eye"
-                    text
-                    rounded
-                    size="small"
-                    @click="router.push(`/requerimientos/${data.id}`)"
-                  />
-                  <Button
-                    v-if="auth.isAdmin"
-                    title="Archivar"
-                    icon="pi pi-inbox"
-                    text
-                    rounded
-                    size="small"
-                    severity="warn"
-                    @click="confirmarArchivar(data)"
-                  />
-                </div>
-              </template>
-            </Column>
-          </DataTable>
-        </div>
-      </main>
+      <Button
+        label="Nuevo Requerimiento"
+        icon="pi pi-plus"
+        @click="router.push('/requerimientos/nuevo')"
+      />
     </div>
-  </div>
+
+    <!-- Barra de filtros -->
+    <div class="flex flex-wrap items-center gap-3 p-4 mb-5 bg-white rounded-xl shadow-sm border border-gray-100">
+      <Select
+        v-model="filtroEstado"
+        :options="opcionesEstado"
+        option-label="label"
+        option-value="value"
+        placeholder="Estado"
+        show-clear
+        class="w-44"
+        @change="aplicarFiltros"
+      />
+      <Select
+        v-model="filtroTipo"
+        :options="opcionesTipo"
+        option-label="label"
+        option-value="value"
+        placeholder="Tipo"
+        show-clear
+        class="w-44"
+        @change="aplicarFiltros"
+      />
+      <Select
+        v-model="filtroPrioridad"
+        :options="opcionesPrioridad"
+        option-label="label"
+        option-value="value"
+        placeholder="Prioridad"
+        show-clear
+        class="w-40"
+        @change="aplicarFiltros"
+      />
+      <Button
+        label="Limpiar filtros"
+        icon="pi pi-filter-slash"
+        text
+        severity="secondary"
+        size="small"
+        :disabled="!filtroEstado && !filtroTipo && !filtroPrioridad"
+        @click="limpiarFiltros"
+      />
+    </div>
+
+    <!-- Error -->
+    <Message v-if="req.error" severity="error" :closable="false" class="mb-4">
+      {{ req.error }}
+    </Message>
+
+    <!-- Loading -->
+    <div v-if="req.loading" class="flex flex-col items-center justify-center py-24 gap-3">
+      <ProgressSpinner style="width:50px;height:50px" strokeWidth="4" />
+      <span class="text-sm text-slate-400">Cargando requerimientos…</span>
+    </div>
+
+    <!-- Tabla -->
+    <div v-else class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+      <DataTable
+        :value="req.requerimientos"
+        :rows="15"
+        :paginator="req.requerimientos.length > 15"
+        paginator-template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink"
+        :row-class="() => 'cursor-pointer hover:bg-blue-50 transition-colors'"
+        @row-click="navegarDetalle"
+      >
+        <template #empty>
+          <div class="flex flex-col items-center py-16 text-slate-400">
+            <i class="pi pi-inbox text-6xl mb-4 text-slate-300"></i>
+            <p class="text-base font-medium text-slate-500">No hay requerimientos</p>
+            <p class="text-sm mt-1">
+              {{ filtroEstado || filtroTipo || filtroPrioridad
+                ? 'Prueba cambiando los filtros'
+                : 'Crea el primero con el botón "Nuevo Requerimiento"' }}
+            </p>
+            <Button
+              v-if="!filtroEstado && !filtroTipo && !filtroPrioridad"
+              label="Nuevo Requerimiento"
+              icon="pi pi-plus"
+              size="small"
+              class="mt-4"
+              @click.stop="router.push('/requerimientos/nuevo')"
+            />
+          </div>
+        </template>
+
+        <Column field="id" header="#" style="width:4rem;color:#64748b;font-size:0.8rem" />
+
+        <Column field="titulo" header="Título">
+          <template #body="{ data }">
+            <span class="font-medium text-slate-800">{{ data.titulo }}</span>
+          </template>
+        </Column>
+
+        <Column field="tipo" header="Tipo" style="width:9rem">
+          <template #body="{ data }">
+            <span class="text-sm text-slate-600">{{ tipoLabel(data.tipo) }}</span>
+          </template>
+        </Column>
+
+        <Column field="prioridad" header="Prioridad" style="width:8rem">
+          <template #body="{ data }">
+            <span class="px-2 py-0.5 rounded-full text-xs font-semibold" :style="prioridadStyle(data.prioridad)">
+              {{ prioridadLabel(data.prioridad) }}
+            </span>
+          </template>
+        </Column>
+
+        <Column field="estado" header="Estado" style="width:10rem">
+          <template #body="{ data }">
+            <span class="px-2 py-0.5 rounded-full text-xs font-semibold" :style="estadoStyle(data.estado)">
+              {{ estadoLabel(data.estado) }}
+            </span>
+          </template>
+        </Column>
+
+        <Column field="creado_en" header="Fecha" style="width:9rem">
+          <template #body="{ data }">
+            <span class="text-sm text-slate-500">{{ formatFecha(data.creado_en) }}</span>
+          </template>
+        </Column>
+
+        <Column header="Acciones" style="width:7rem">
+          <template #body="{ data }">
+            <div class="flex gap-1" @click.stop>
+              <Button
+                title="Ver detalle"
+                icon="pi pi-eye"
+                text rounded size="small"
+                @click="router.push(`/requerimientos/${data.id}`)"
+              />
+              <Button
+                v-if="auth.isAdmin || auth.isSuperAdmin"
+                title="Archivar"
+                icon="pi pi-inbox"
+                text rounded size="small"
+                severity="warn"
+                @click="confirmarArchivar(data)"
+              />
+            </div>
+          </template>
+        </Column>
+      </DataTable>
+    </div>
+  </AppLayout>
 </template>
