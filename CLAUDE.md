@@ -94,14 +94,21 @@ Lee CLAUDE.md e implementa: [nombre de la vista]"
 - Axios instance con interceptores JWT (src/services/api.js)
 - Store de autenticacion Pinia (src/stores/auth.js)
 - Store de requerimientos Pinia (src/stores/requirements.js)
+- Store de tema dark/light (src/stores/theme.js) con persistencia localStorage
 - Router con navigation guard (Vue Router 5 API)
 - AppLayout compartido (header + sidebar)
-- useBadges composable (badges de estado y prioridad)
-- Vista Login completa con PrimeVue + gradiente azul
-- Vista Dashboard con DataTable, filtros y badges
+  - Sidebar colapsable en mobile con hamburger y overlay
+  - Boton dark mode toggle (luna/sol) en header
+- useBadges composable con soporte dark/light mode
+- Vista Login completa — error persistente, sin recarga en 401
+- Vista Dashboard con DataTable, filtros, badges y contadores animados
 - Vista Nuevo Requerimiento con formulario y validacion
 - Vista Detalle con panel admin (cambiar estado, archivar)
 - Vista Perfil con datos del usuario y logout
+- Vista 404 personalizada con branding ReqFlow
+- Dark mode completo: sidebar, cards, tabla, badges, inputs, dialogs
+- Responsive mobile: cards 2x2, tabla con scroll horizontal,
+  formularios en columna unica en mobile
 - vercel.json para SPA routing
 - Deploy en Vercel: https://reqflow-requirements.vercel.app
 
