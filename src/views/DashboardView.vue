@@ -167,11 +167,11 @@ onMounted(() => req.cargarRequerimientos({}))
     <!-- Cards de métricas -->
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
       <!-- Total -->
-      <div class="bg-white rounded-xl p-6 shadow-sm border-l-4" style="border-left-color:#0f2557">
+      <div :class="themeStore.isDark ? 'bg-slate-800 shadow-slate-900' : 'bg-white shadow-sm'" class="rounded-xl p-6 border-l-4 shadow" style="border-left-color:#0f2557">
         <div class="flex items-center justify-between">
           <div>
             <p class="text-sm text-gray-500 mb-1">Total requerimientos</p>
-            <p class="text-3xl font-bold text-gray-800">{{ Math.round(animTotal) }}</p>
+            <p :class="themeStore.isDark ? 'text-white' : 'text-gray-800'" class="text-3xl font-bold mt-1">{{ Math.round(animTotal) }}</p>
           </div>
           <div class="p-3 rounded-full bg-gray-50">
             <i class="pi pi-list-check text-2xl" style="color:#0f2557"></i>
@@ -179,11 +179,11 @@ onMounted(() => req.cargarRequerimientos({}))
         </div>
       </div>
       <!-- En proceso -->
-      <div class="bg-white rounded-xl p-6 shadow-sm border-l-4" style="border-left-color:#f59e0b">
+      <div :class="themeStore.isDark ? 'bg-slate-800 shadow-slate-900' : 'bg-white shadow-sm'" class="rounded-xl p-6 border-l-4 shadow" style="border-left-color:#f59e0b">
         <div class="flex items-center justify-between">
           <div>
             <p class="text-sm text-gray-500 mb-1">En proceso</p>
-            <p class="text-3xl font-bold text-gray-800">{{ Math.round(animPendientes) }}</p>
+            <p :class="themeStore.isDark ? 'text-white' : 'text-gray-800'" class="text-3xl font-bold mt-1">{{ Math.round(animPendientes) }}</p>
           </div>
           <div class="p-3 rounded-full bg-gray-50">
             <i class="pi pi-clock text-2xl" style="color:#f59e0b"></i>
@@ -191,11 +191,11 @@ onMounted(() => req.cargarRequerimientos({}))
         </div>
       </div>
       <!-- Resueltos -->
-      <div class="bg-white rounded-xl p-6 shadow-sm border-l-4" style="border-left-color:#10b981">
+      <div :class="themeStore.isDark ? 'bg-slate-800 shadow-slate-900' : 'bg-white shadow-sm'" class="rounded-xl p-6 border-l-4 shadow" style="border-left-color:#10b981">
         <div class="flex items-center justify-between">
           <div>
             <p class="text-sm text-gray-500 mb-1">Resueltos</p>
-            <p class="text-3xl font-bold text-gray-800">{{ Math.round(animResueltos) }}</p>
+            <p :class="themeStore.isDark ? 'text-white' : 'text-gray-800'" class="text-3xl font-bold mt-1">{{ Math.round(animResueltos) }}</p>
           </div>
           <div class="p-3 rounded-full bg-gray-50">
             <i class="pi pi-check-circle text-2xl" style="color:#10b981"></i>
@@ -203,11 +203,11 @@ onMounted(() => req.cargarRequerimientos({}))
         </div>
       </div>
       <!-- Alta prioridad -->
-      <div class="bg-white rounded-xl p-6 shadow-sm border-l-4" style="border-left-color:#ef4444">
+      <div :class="themeStore.isDark ? 'bg-slate-800 shadow-slate-900' : 'bg-white shadow-sm'" class="rounded-xl p-6 border-l-4 shadow" style="border-left-color:#ef4444">
         <div class="flex items-center justify-between">
           <div>
             <p class="text-sm text-gray-500 mb-1">Alta prioridad</p>
-            <p class="text-3xl font-bold text-gray-800">{{ Math.round(animAlta) }}</p>
+            <p :class="themeStore.isDark ? 'text-white' : 'text-gray-800'" class="text-3xl font-bold mt-1">{{ Math.round(animAlta) }}</p>
           </div>
           <div class="p-3 rounded-full bg-gray-50">
             <i class="pi pi-exclamation-triangle text-2xl" style="color:#ef4444"></i>

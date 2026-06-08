@@ -1,7 +1,8 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useToast } from 'primevue/usetoast'
+import { useThemeStore } from '../stores/theme'
 import api from '../services/api'
 import AppLayout from '../components/AppLayout.vue'
 import InputText from 'primevue/inputtext'
@@ -11,8 +12,9 @@ import Button from 'primevue/button'
 import Message from 'primevue/message'
 import Toast from 'primevue/toast'
 
-const router  = useRouter()
-const toast   = useToast()
+const router     = useRouter()
+const toast      = useToast()
+const themeStore = useThemeStore()
 
 const titulo      = ref('')
 const descripcion = ref('')
@@ -90,19 +92,24 @@ async function crear() {
 
         <!-- Card header -->
         <div
+          :class="themeStore.isDark ? 'bg-slate-700' : ''"
+          :style="themeStore.isDark ? '' : 'background:linear-gradient(135deg,#f8fafc,#f0f4ff)'"
           class="px-8 py-6 border-b border-gray-100"
-          style="background:linear-gradient(135deg,#f8fafc,#f0f4ff)"
         >
           <div class="flex items-center gap-4">
             <div
               class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
-              style="background:#0f2557"
+              :style="themeStore.isDark ? 'background:#1e3a8a' : 'background:#0f2557'"
             >
               <i class="pi pi-file-plus text-white text-xl"></i>
             </div>
             <div>
-              <h1 class="text-xl font-bold text-gray-800">Nuevo Requerimiento</h1>
-              <p class="text-sm text-gray-500 mt-0.5">Completa los campos para registrar el requerimiento</p>
+              <h1 :class="themeStore.isDark ? 'text-white' : 'text-gray-800'" class="text-xl font-bold">
+                Nuevo Requerimiento
+              </h1>
+              <p :class="themeStore.isDark ? 'text-slate-300' : 'text-gray-500'" class="text-sm mt-0.5">
+                Completa los campos para registrar el requerimiento
+              </p>
             </div>
           </div>
         </div>

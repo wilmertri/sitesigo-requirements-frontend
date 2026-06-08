@@ -2,19 +2,21 @@
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
+import { useThemeStore } from '../stores/theme'
 import AppLayout from '../components/AppLayout.vue'
 import Card from 'primevue/card'
 import Button from 'primevue/button'
 
-const router = useRouter()
-const auth   = useAuthStore()
+const router     = useRouter()
+const auth       = useAuthStore()
+const themeStore = useThemeStore()
 
-const ROL_CONFIG = {
-    super_admin:    { label: 'Super Administrador', bg: '#fce7f3', color: '#9d174d' },
-    administrador:  { label: 'Administrador',       bg: '#fef9c3', color: '#854d0e' },
-    funcionario:    { label: 'Funcionario',          bg: '#dbeafe', color: '#1e40af' },
-    equipo_tecnico: { label: 'Equipo Técnico',       bg: '#dcfce7', color: '#166534' },
-    equipo:         { label: 'Equipo Técnico',       bg: '#dcfce7', color: '#166534' },
+const ROL_STYLES = {
+    super_admin:    { light: 'background:#fce7f3;color:#9d174d', dark: 'background:#7f1d1d;color:#fca5a5' },
+    administrador:  { light: 'background:#dbeafe;color:#1d4ed8', dark: 'background:#1e3a5f;color:#93c5fd' },
+    funcionario:    { light: 'background:#dcfce7;color:#15803d', dark: 'background:#14532d;color:#86efac' },
+    equipo_tecnico: { light: 'background:#f1f5f9;color:#475569', dark: 'background:#1e293b;color:#94a3b8' },
+    equipo:         { light: 'background:#f1f5f9;color:#475569', dark: 'background:#1e293b;color:#94a3b8' },
 }
 
 function formatearRol(rol) {
@@ -27,9 +29,10 @@ function formatearRol(rol) {
     return roles[rol] || rol
 }
 
-const rolInfo = computed(() => {
-    const key = (auth.user?.rol ?? '').toLowerCase()
-    return ROL_CONFIG[key] ?? { label: auth.user?.rol ?? 'Sin rol', bg: '#f3f4f6', color: '#6b7280' }
+const rolStyle = computed(() => {
+    const key  = (auth.user?.rol ?? '').toLowerCase()
+    const modo = themeStore.isDark ? 'dark' : 'light'
+    return ROL_STYLES[key]?.[modo] ?? (themeStore.isDark ? 'background:#1e293b;color:#94a3b8' : 'background:#f3f4f6;color:#6b7280')
 })
 
 function formatFecha(f) {
@@ -89,10 +92,10 @@ function cerrarSesion() {
             <div class="flex items-center justify-between py-2 border-b border-slate-50">
               <span class="text-sm font-medium text-slate-500">Rol en el sistema</span>
               <span
-                class="px-3 py-0.5 rounded-full text-xs font-semibold"
-                :style="`background:${rolInfo.bg};color:${rolInfo.color}`"
+                :style="rolStyle"
+                class="px-3 py-1 rounded-full text-sm font-medium"
               >
-                {{ rolInfo.label }}
+                {{ formatearRol(auth.user?.rol) }}
               </span>
             </div>
 
