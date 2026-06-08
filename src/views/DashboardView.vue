@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { useRequirementsStore } from '../stores/requirements'
@@ -115,6 +115,30 @@ function formatFecha(f)   {
     return new Date(f).toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' })
 }
 
+// ── Métricas ───────────────────────────────────────────────────────────────────
+const metricas = computed(() => {
+    const reqs = req.requerimientos
+    return {
+        total:         reqs.length,
+        pendientes:    reqs.filter(r => r.estado === 'Nuevo' || r.estado === 'En analisis' || r.estado === 'En desarrollo').length,
+        resueltos:     reqs.filter(r => r.estado === 'Resuelto').length,
+        alta_prioridad: reqs.filter(r => r.prioridad === 'Alta').length,
+    }
+})
+
+const saludo = computed(() => {
+    const hora = new Date().getHours()
+    if (hora < 12) return 'Buenos días'
+    if (hora < 18) return 'Buenas tardes'
+    return 'Buenas noches'
+})
+
+const fechaHoy = computed(() =>
+    new Date().toLocaleDateString('es-CO', {
+        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+    })
+)
+
 onMounted(() => req.cargarRequerimientos({}))
 </script>
 
@@ -123,22 +147,71 @@ onMounted(() => req.cargarRequerimientos({}))
     <Toast position="top-right" />
     <ConfirmDialog />
 
-    <!-- Título + botón nuevo -->
-    <div class="flex items-start justify-between mb-5">
+    <!-- Saludo + botón nuevo -->
+    <div class="flex items-start justify-between mb-6">
       <div>
-        <h1 class="text-2xl font-bold text-slate-800">Requerimientos</h1>
-        <p class="text-sm text-slate-500 mt-0.5">
-          <template v-if="!req.loading">
-            {{ req.requerimientos.length }}
-            requerimiento{{ req.requerimientos.length !== 1 ? 's' : '' }}
-          </template>
-        </p>
+        <h1 class="text-2xl font-bold text-gray-800">
+          {{ saludo }}, {{ auth.user?.nombre || auth.user?.email }}
+        </h1>
+        <p class="text-gray-500 text-sm mt-1 capitalize">{{ fechaHoy }}</p>
       </div>
       <Button
         label="Nuevo Requerimiento"
         icon="pi pi-plus"
         @click="router.push('/requerimientos/nuevo')"
       />
+    </div>
+
+    <!-- Cards de métricas -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <!-- Total -->
+      <div class="bg-white rounded-xl p-6 shadow-sm border-l-4" style="border-left-color:#0f2557">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-gray-500 mb-1">Total requerimientos</p>
+            <p class="text-3xl font-bold text-gray-800">{{ metricas.total }}</p>
+          </div>
+          <div class="p-3 rounded-full bg-gray-50">
+            <i class="pi pi-list-check text-2xl" style="color:#0f2557"></i>
+          </div>
+        </div>
+      </div>
+      <!-- En proceso -->
+      <div class="bg-white rounded-xl p-6 shadow-sm border-l-4" style="border-left-color:#f59e0b">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-gray-500 mb-1">En proceso</p>
+            <p class="text-3xl font-bold text-gray-800">{{ metricas.pendientes }}</p>
+          </div>
+          <div class="p-3 rounded-full bg-gray-50">
+            <i class="pi pi-clock text-2xl" style="color:#f59e0b"></i>
+          </div>
+        </div>
+      </div>
+      <!-- Resueltos -->
+      <div class="bg-white rounded-xl p-6 shadow-sm border-l-4" style="border-left-color:#10b981">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-gray-500 mb-1">Resueltos</p>
+            <p class="text-3xl font-bold text-gray-800">{{ metricas.resueltos }}</p>
+          </div>
+          <div class="p-3 rounded-full bg-gray-50">
+            <i class="pi pi-check-circle text-2xl" style="color:#10b981"></i>
+          </div>
+        </div>
+      </div>
+      <!-- Alta prioridad -->
+      <div class="bg-white rounded-xl p-6 shadow-sm border-l-4" style="border-left-color:#ef4444">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-gray-500 mb-1">Alta prioridad</p>
+            <p class="text-3xl font-bold text-gray-800">{{ metricas.alta_prioridad }}</p>
+          </div>
+          <div class="p-3 rounded-full bg-gray-50">
+            <i class="pi pi-exclamation-triangle text-2xl" style="color:#ef4444"></i>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Barra de filtros -->
@@ -196,7 +269,12 @@ onMounted(() => req.cargarRequerimientos({}))
     </div>
 
     <!-- Tabla -->
-    <div v-else class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+    <div v-else>
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-semibold text-gray-700">Lista de requerimientos</h2>
+        <span class="text-sm text-gray-500">{{ req.requerimientos.length }} resultados</span>
+      </div>
+      <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
       <DataTable
         :value="req.requerimientos"
         :rows="15"
@@ -282,6 +360,7 @@ onMounted(() => req.cargarRequerimientos({}))
           </template>
         </Column>
       </DataTable>
+      </div>
     </div>
   </AppLayout>
 </template>
