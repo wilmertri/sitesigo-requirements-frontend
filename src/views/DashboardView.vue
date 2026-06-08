@@ -133,11 +133,12 @@ const saludo = computed(() => {
     return 'Buenas noches'
 })
 
-const fechaHoy = computed(() =>
-    new Date().toLocaleDateString('es-CO', {
+const fechaHoy = computed(() => {
+    const fecha = new Date().toLocaleDateString('es-CO', {
         weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
     })
-)
+    return fecha.charAt(0).toUpperCase() + fecha.slice(1)
+})
 
 onMounted(() => req.cargarRequerimientos({}))
 </script>
@@ -153,7 +154,7 @@ onMounted(() => req.cargarRequerimientos({}))
         <h1 class="text-2xl font-bold text-gray-800">
           {{ saludo }}, {{ auth.user?.nombre || auth.user?.email }}
         </h1>
-        <p class="text-gray-500 text-sm mt-1 capitalize">{{ fechaHoy }}</p>
+        <p class="text-gray-500 text-sm mt-1">{{ fechaHoy }}</p>
       </div>
       <Button
         label="Nuevo Requerimiento"
