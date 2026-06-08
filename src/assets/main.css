@@ -1,2 +1,18 @@
 @import "tailwindcss";
 @import './base.css';
+
+:root {
+    --reqflow-navy:   #0f2557;
+    --reqflow-blue:   #1e3a8a;
+    --reqflow-accent: #3b82f6;
+    --reqflow-success: #10b981;
+    --reqflow-warning: #f59e0b;
+    --reqflow-danger:  #ef4444;
+    --reqflow-bg:      #f8fafc;
+    --reqflow-surface: #ffffff;
+}
+
+body {
+    background-color: var(--reqflow-bg);
+    font-family: 'Inter', sans-serif;
+}

@@ -148,11 +148,22 @@ onMounted(() => store.cargarProyectos())
     <!-- Dialog nuevo proyecto -->
     <Dialog
       v-model:visible="dialogVisible"
-      header="Nuevo Proyecto"
       :style="{ width: '480px' }"
       :modal="true"
     >
-      <div class="flex flex-col gap-4 pt-2">
+      <template #header>
+        <div class="flex items-center gap-3">
+          <div
+            class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
+            style="background:#0f2557"
+          >
+            <i class="pi pi-sitemap text-white text-sm"></i>
+          </div>
+          <span class="text-lg font-semibold text-gray-800">Nuevo Proyecto</span>
+        </div>
+      </template>
+
+      <div class="flex flex-col gap-5 p-6">
         <div class="flex flex-col gap-1.5">
           <label class="text-sm font-medium text-slate-700">
             Nombre <span class="text-red-500">*</span>

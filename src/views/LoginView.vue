@@ -3,7 +3,6 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { useToast } from 'primevue/usetoast'
-import Card from 'primevue/card'
 import InputText from 'primevue/inputtext'
 import Password from 'primevue/password'
 import Button from 'primevue/button'
@@ -13,90 +12,99 @@ import IconField from 'primevue/iconfield'
 import InputIcon from 'primevue/inputicon'
 
 const router = useRouter()
-const auth = useAuthStore()
-const toast = useToast()
+const auth   = useAuthStore()
+const toast  = useToast()
 
-const email = ref('')
-const password = ref('')
-const loading = ref(false)
+const email        = ref('')
+const password     = ref('')
+const loading      = ref(false)
 const errorGeneral = ref('')
-const errors = ref({ email: '', password: '' })
+const errors       = ref({ email: '', password: '' })
 
 function validate() {
-  errors.value = { email: '', password: '' }
-  let valid = true
-  if (!email.value.trim()) {
-    errors.value.email = 'El correo es requerido'
-    valid = false
-  }
-  if (!password.value) {
-    errors.value.password = 'La contraseña es requerida'
-    valid = false
-  }
-  return valid
+    errors.value = { email: '', password: '' }
+    let valid = true
+    if (!email.value.trim())  { errors.value.email    = 'El correo es requerido';    valid = false }
+    if (!password.value)      { errors.value.password = 'La contraseña es requerida'; valid = false }
+    return valid
 }
 
 async function handleLogin() {
-  errorGeneral.value = ''
-  if (!validate()) return
-  loading.value = true
-  try {
-    await auth.login(email.value, password.value)
-    toast.add({
-      severity: 'success',
-      summary: 'Bienvenido',
-      detail: 'Sesión iniciada correctamente',
-      life: 2000
-    })
-    setTimeout(() => router.push('/dashboard'), 600)
-  } catch (err) {
-    const status = err.response?.status
-    if (status === 401) {
-      errorGeneral.value = 'Correo o contraseña incorrectos'
-    } else if (status === 422) {
-      errorGeneral.value = 'Datos inválidos. Verifica el correo ingresado.'
-    } else {
-      errorGeneral.value = 'Error al conectar con el servidor. Intenta de nuevo.'
+    errorGeneral.value = ''
+    if (!validate()) return
+    loading.value = true
+    try {
+        await auth.login(email.value, password.value)
+        toast.add({ severity: 'success', summary: 'Bienvenido', detail: 'Sesión iniciada correctamente', life: 2000 })
+        setTimeout(() => router.push('/dashboard'), 600)
+    } catch (err) {
+        const status = err.response?.status
+        if (status === 401)      errorGeneral.value = 'Correo o contraseña incorrectos'
+        else if (status === 422) errorGeneral.value = 'Datos inválidos. Verifica el correo ingresado.'
+        else                     errorGeneral.value = 'Error al conectar con el servidor. Intenta de nuevo.'
+    } finally {
+        loading.value = false
     }
-  } finally {
-    loading.value = false
-  }
 }
 </script>
 
 <template>
-  <div
-    class="min-h-screen flex items-center justify-center p-4"
-    style="background: linear-gradient(135deg, #0f2557 0%, #1a3a7c 50%, #1e5fa8 100%)"
-  >
+  <div class="min-h-screen flex">
     <Toast position="top-right" />
 
-    <div class="w-full max-w-md">
-      <!-- Encabezado institucional -->
-      <div class="flex flex-col items-center text-center mb-8">
-        <img
-          src="@/assets/icon-reqflow.png"
-          alt="ReqFlow"
-          class="h-28 w-28 mx-auto mb-6"
-        />
+    <!-- Columna izquierda — solo desktop -->
+    <div
+      class="hidden lg:flex lg:w-1/2 flex-col justify-between p-12"
+      style="background-color:#0f2557;background-image:radial-gradient(circle at 1px 1px,rgba(255,255,255,0.15) 1px,transparent 0);background-size:32px 32px"
+    >
+      <div></div>
+
+      <div class="flex flex-col items-center text-center">
+        <img src="@/assets/icon-reqflow.png" alt="ReqFlow" class="h-24 w-24 mb-8" />
         <h1 class="text-4xl font-bold text-white mb-3">ReqFlow</h1>
-        <p class="text-blue-200 text-lg">Gestión profesional de requerimientos</p>
+        <p class="text-blue-300 text-lg mb-12">Gestión profesional de requerimientos de software</p>
+
+        <div class="flex flex-col gap-4 text-left w-full max-w-sm">
+          <div v-for="feat in [
+            'Trazabilidad completa de requerimientos',
+            'Roles y permisos por proyecto',
+            'Notificaciones automáticas por email'
+          ]" :key="feat" class="flex items-center gap-3">
+            <div
+              class="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
+              style="background:rgba(255,255,255,0.15)"
+            >
+              <i class="pi pi-check text-sm" style="color:#34d399"></i>
+            </div>
+            <span class="text-blue-100 text-sm">{{ feat }}</span>
+          </div>
+        </div>
       </div>
 
-      <!-- Card de login -->
-      <Card class="shadow-2xl">
-        <template #title>
-          <div class="flex items-center gap-2 pb-1">
-            <i class="pi pi-user text-blue-700"></i>
-            <span class="text-base font-semibold text-slate-700">Acceso al sistema</span>
-          </div>
-        </template>
+      <div class="text-center">
+        <span class="text-blue-400 text-xs">v1.0</span>
+      </div>
+    </div>
 
-        <template #content>
+    <!-- Columna derecha -->
+    <div class="flex-1 flex items-center justify-center p-8" style="background:#f8fafc">
+      <div class="w-full max-w-md">
+
+        <!-- Logo móvil -->
+        <div class="lg:hidden flex flex-col items-center mb-8">
+          <img src="@/assets/icon-reqflow.png" alt="ReqFlow" class="h-16 w-16 mb-3" />
+          <h1 class="text-2xl font-bold text-gray-800">ReqFlow</h1>
+        </div>
+
+        <!-- Card -->
+        <div class="bg-white rounded-2xl shadow-xl p-8">
+          <h2 class="text-2xl font-bold text-gray-800 mb-1">Bienvenido</h2>
+          <p class="text-gray-500 text-sm mb-8">Ingresa tus credenciales para continuar</p>
+
           <form @submit.prevent="handleLogin" class="flex flex-col gap-5">
             <!-- Email -->
             <div class="flex flex-col gap-1.5">
-              <label class="text-sm font-medium text-slate-600">
+              <label class="text-xs font-medium text-gray-500 uppercase tracking-wide">
                 Correo electrónico
               </label>
               <IconField>
@@ -111,14 +119,13 @@ async function handleLogin() {
                 />
               </IconField>
               <small v-if="errors.email" class="text-red-500 text-xs flex items-center gap-1">
-                <i class="pi pi-exclamation-circle text-xs"></i>
-                {{ errors.email }}
+                <i class="pi pi-exclamation-circle text-xs"></i>{{ errors.email }}
               </small>
             </div>
 
             <!-- Password -->
             <div class="flex flex-col gap-1.5">
-              <label class="text-sm font-medium text-slate-600">
+              <label class="text-xs font-medium text-gray-500 uppercase tracking-wide">
                 Contraseña
               </label>
               <Password
@@ -131,17 +138,16 @@ async function handleLogin() {
                 autocomplete="current-password"
               />
               <small v-if="errors.password" class="text-red-500 text-xs flex items-center gap-1">
-                <i class="pi pi-exclamation-circle text-xs"></i>
-                {{ errors.password }}
+                <i class="pi pi-exclamation-circle text-xs"></i>{{ errors.password }}
               </small>
             </div>
 
-            <!-- Error general del servidor -->
+            <!-- Error general -->
             <Message v-if="errorGeneral" severity="error" :closable="false">
               {{ errorGeneral }}
             </Message>
 
-            <!-- Botón submit -->
+            <!-- Submit -->
             <Button
               label="Iniciar sesión"
               type="submit"
@@ -150,21 +156,11 @@ async function handleLogin() {
               iconPos="right"
               fluid
               class="mt-1"
+              style="background:linear-gradient(135deg,#1e3a8a,#3b82f6);border:none"
             />
           </form>
-        </template>
-      </Card>
-
-      <!-- Link a registro -->
-      <p class="text-center mt-5 text-sm" style="color: rgba(191,219,254,0.9)">
-        ¿No tienes cuenta?
-        <RouterLink
-          to="/registro"
-          class="text-white font-semibold ml-1 hover:underline underline-offset-2"
-        >
-          Registrarse
-        </RouterLink>
-      </p>
+        </div>
+      </div>
     </div>
   </div>
 </template>

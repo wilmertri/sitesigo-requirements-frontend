@@ -191,11 +191,22 @@ onMounted(() => store.cargarUsuarios(proyectoId.value))
     <!-- Dialog agregar usuario -->
     <Dialog
       v-model:visible="dialogVisible"
-      header="Agregar Usuario al Proyecto"
       :style="{ width: '480px' }"
       :modal="true"
     >
-      <div class="flex flex-col gap-4 pt-2">
+      <template #header>
+        <div class="flex items-center gap-3">
+          <div
+            class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
+            style="background:#0f2557"
+          >
+            <i class="pi pi-user-plus text-white text-sm"></i>
+          </div>
+          <span class="text-lg font-semibold text-gray-800">Agregar Usuario al Proyecto</span>
+        </div>
+      </template>
+
+      <div class="flex flex-col gap-5 p-6">
         <div class="flex flex-col gap-1.5">
           <label class="text-sm font-medium text-slate-700">
             Email <span class="text-red-500">*</span>
