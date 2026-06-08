@@ -16,11 +16,12 @@ api.interceptors.request.use(config => {
     return config
 })
 
-// Interceptor: maneja token expirado
+// Interceptor: maneja token expirado (no actúa en el endpoint de login)
 api.interceptors.response.use(
     response => response,
     error => {
-        if (error.response?.status === 401) {
+        const isLoginEndpoint = error.config?.url?.includes('/auth/token')
+        if (error.response?.status === 401 && !isLoginEndpoint) {
             localStorage.removeItem('jwt_token')
             localStorage.removeItem('user')
             window.location.href = '/login'
