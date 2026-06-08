@@ -115,3 +115,18 @@ Lee CLAUDE.md e implementa: [nombre de la vista]"
 - Los endpoints requieren header Authorization: Bearer token
 - POST /auth/token usa form-data no JSON (OAuth2)
 - Navigation guards usan return en lugar de next() (Vue Router 5)
+
+## Convenciones y errores comunes
+
+### Interceptores de Axios
+El interceptor de 401 en src/services/api.js
+excluye /auth/token para evitar que un login
+fallido cause recarga de pagina.
+
+Si agregas nuevos endpoints publicos que
+puedan devolver 401 sin ser errores de sesion,
+agregalos a la lista de exclusiones:
+
+const esEndpointPublico =
+    error.config?.url?.includes('/auth/token') ||
+    error.config?.url?.includes('/auth/registro')
