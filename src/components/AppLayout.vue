@@ -82,7 +82,7 @@ function handleLogout() {
     >
       <div class="flex items-center gap-3">
         <div class="flex items-center gap-2">
-          <i class="pi pi-shield text-white text-lg"></i>
+          <img src="@/assets/logo-reqflow.png" alt="ReqFlow" class="h-7 w-auto" />
           <span class="text-lg font-black tracking-widest text-white">ReqFlow</span>
         </div>
         <span

@@ -73,17 +73,14 @@ async function handleLogin() {
 
     <div class="w-full max-w-md">
       <!-- Encabezado institucional -->
-      <div class="text-center mb-8">
-        <div
-          class="inline-flex items-center justify-center w-16 h-16 rounded-2xl shadow-lg mb-4"
-          style="background: rgba(255,255,255,0.15); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.2)"
-        >
-          <i class="pi pi-shield" style="font-size: 1.75rem; color: #fff"></i>
-        </div>
-        <h1 class="text-4xl font-black text-white tracking-widest">ReqFlow</h1>
-        <p class="text-blue-200 text-sm mt-1 font-medium tracking-wide">
-          Gestión de Requerimientos de Software
-        </p>
+      <div class="flex flex-col items-center text-center mb-8">
+        <img
+          src="@/assets/logo-reqflow.png"
+          alt="ReqFlow"
+          class="h-20 w-auto mb-6 brightness-0 invert"
+        />
+        <h1 class="text-4xl font-bold text-white mb-3">ReqFlow</h1>
+        <p class="text-blue-200 text-lg">Gestión profesional de requerimientos</p>
       </div>
 
       <!-- Card de login -->
