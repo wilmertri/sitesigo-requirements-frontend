@@ -1,5 +1,6 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
+import { useTransition, TransitionPresets } from '@vueuse/core'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { useRequirementsStore } from '../stores/requirements'
@@ -126,6 +127,22 @@ const metricas = computed(() => {
     }
 })
 
+// ── Contadores animados ────────────────────────────────────────────────────────
+const totalAnimado      = ref(0)
+const pendientesAnimado = ref(0)
+const resueltosAnimado  = ref(0)
+const altaAnimado       = ref(0)
+
+const animTotal      = useTransition(totalAnimado,      { duration: 1000, transition: TransitionPresets.easeOutExpo })
+const animPendientes = useTransition(pendientesAnimado, { duration: 1000, transition: TransitionPresets.easeOutExpo })
+const animResueltos  = useTransition(resueltosAnimado,  { duration: 1200, transition: TransitionPresets.easeOutExpo })
+const animAlta       = useTransition(altaAnimado,       { duration: 800,  transition: TransitionPresets.easeOutExpo })
+
+watch(() => metricas.value.total,         (v) => { totalAnimado.value      = v }, { immediate: true })
+watch(() => metricas.value.pendientes,    (v) => { pendientesAnimado.value = v }, { immediate: true })
+watch(() => metricas.value.resueltos,     (v) => { resueltosAnimado.value  = v }, { immediate: true })
+watch(() => metricas.value.alta_prioridad,(v) => { altaAnimado.value       = v }, { immediate: true })
+
 const saludo = computed(() => {
     const hora = new Date().getHours()
     if (hora < 12) return 'Buenos días'
@@ -170,7 +187,7 @@ onMounted(() => req.cargarRequerimientos({}))
         <div class="flex items-center justify-between">
           <div>
             <p class="text-sm text-gray-500 mb-1">Total requerimientos</p>
-            <p class="text-3xl font-bold text-gray-800">{{ metricas.total }}</p>
+            <p class="text-3xl font-bold text-gray-800">{{ Math.round(animTotal) }}</p>
           </div>
           <div class="p-3 rounded-full bg-gray-50">
             <i class="pi pi-list-check text-2xl" style="color:#0f2557"></i>
@@ -182,7 +199,7 @@ onMounted(() => req.cargarRequerimientos({}))
         <div class="flex items-center justify-between">
           <div>
             <p class="text-sm text-gray-500 mb-1">En proceso</p>
-            <p class="text-3xl font-bold text-gray-800">{{ metricas.pendientes }}</p>
+            <p class="text-3xl font-bold text-gray-800">{{ Math.round(animPendientes) }}</p>
           </div>
           <div class="p-3 rounded-full bg-gray-50">
             <i class="pi pi-clock text-2xl" style="color:#f59e0b"></i>
@@ -194,7 +211,7 @@ onMounted(() => req.cargarRequerimientos({}))
         <div class="flex items-center justify-between">
           <div>
             <p class="text-sm text-gray-500 mb-1">Resueltos</p>
-            <p class="text-3xl font-bold text-gray-800">{{ metricas.resueltos }}</p>
+            <p class="text-3xl font-bold text-gray-800">{{ Math.round(animResueltos) }}</p>
           </div>
           <div class="p-3 rounded-full bg-gray-50">
             <i class="pi pi-check-circle text-2xl" style="color:#10b981"></i>
@@ -206,7 +223,7 @@ onMounted(() => req.cargarRequerimientos({}))
         <div class="flex items-center justify-between">
           <div>
             <p class="text-sm text-gray-500 mb-1">Alta prioridad</p>
-            <p class="text-3xl font-bold text-gray-800">{{ metricas.alta_prioridad }}</p>
+            <p class="text-3xl font-bold text-gray-800">{{ Math.round(animAlta) }}</p>
           </div>
           <div class="p-3 rounded-full bg-gray-50">
             <i class="pi pi-exclamation-triangle text-2xl" style="color:#ef4444"></i>
@@ -275,7 +292,7 @@ onMounted(() => req.cargarRequerimientos({}))
         <h2 class="text-lg font-semibold text-gray-700">Lista de requerimientos</h2>
         <span class="text-sm text-gray-500">{{ req.requerimientos.length }} resultados</span>
       </div>
-      <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+      <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden overflow-x-auto">
       <DataTable
         :value="req.requerimientos"
         :rows="15"
@@ -318,7 +335,7 @@ onMounted(() => req.cargarRequerimientos({}))
           </template>
         </Column>
 
-        <Column field="tipo" header="Tipo" style="width:9rem">
+        <Column field="tipo" header="Tipo" style="width:9rem" class="hidden md:table-cell">
           <template #body="{ data }">
             <span class="text-sm text-slate-600">{{ tipoLabel(data.tipo) }}</span>
           </template>
@@ -340,7 +357,7 @@ onMounted(() => req.cargarRequerimientos({}))
           </template>
         </Column>
 
-        <Column field="creado_en" header="Fecha" style="width:9rem">
+        <Column field="creado_en" header="Fecha" style="width:9rem" class="hidden lg:table-cell">
           <template #body="{ data }">
             <span class="text-sm text-slate-500">{{ formatFecha(data.creado_en) }}</span>
           </template>

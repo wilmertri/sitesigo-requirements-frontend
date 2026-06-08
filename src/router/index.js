@@ -48,6 +48,12 @@ const routes = [
         component: () => import('../views/ProyectoUsuariosView.vue'),
         meta: { requiresAuth: true }
     },
+    {
+        path: '/:pathMatch(.*)*',
+        name: 'NotFound',
+        component: () => import('../views/NotFoundView.vue'),
+        meta: { requiresAuth: false }
+    },
 ]
 
 const router = createRouter({
@@ -58,7 +64,7 @@ const router = createRouter({
 router.beforeEach((to) => {
     const auth = useAuthStore()
     if (to.meta.requiresAuth && !auth.isAuthenticated) return '/login'
-    if (!to.meta.requiresAuth && auth.isAuthenticated) return '/dashboard'
+    if (!to.meta.requiresAuth && auth.isAuthenticated && to.name !== 'NotFound') return '/dashboard'
     if (to.meta.requiresSuperAdmin && !auth.isSuperAdmin) return '/dashboard'
 })
 

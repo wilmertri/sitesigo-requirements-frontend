@@ -156,7 +156,7 @@ async function crear() {
               <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Clasificación</h2>
             </div>
 
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div class="flex flex-col gap-1.5">
                 <label class="text-xs font-medium text-gray-500 uppercase tracking-wide">
                   Tipo <span class="text-red-500">*</span>

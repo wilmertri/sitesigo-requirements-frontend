@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref, watch } from 'vue'
+import { computed, ref, watch, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import api from '../services/api'
@@ -71,31 +71,52 @@ function handleLogout() {
     authStore.logout()
     router.push('/login')
 }
+
+// ── Sidebar mobile ─────────────────────────────────────────────────────────────
+const sidebarAbierto = ref(false)
+const toggleSidebar  = () => { sidebarAbierto.value = !sidebarAbierto.value }
+
+// Cierra el sidebar al navegar
+watch(() => route.path, () => { sidebarAbierto.value = false })
+
+// Cierra el sidebar si la pantalla se hace grande
+function onResize() { if (window.innerWidth >= 768) sidebarAbierto.value = false }
+onMounted(()   => window.addEventListener('resize', onResize))
+onUnmounted(() => window.removeEventListener('resize', onResize))
 </script>
 
 <template>
   <div class="min-h-screen flex flex-col" style="background:#f1f5f9">
     <!-- ── Header ──────────────────────────────────────────────── -->
     <header
-      class="h-14 flex items-center justify-between px-6 shadow-md z-10 shrink-0"
+      class="h-14 flex items-center justify-between px-4 md:px-6 shadow-md z-10 shrink-0"
       style="background:#1e3a8a"
     >
       <div class="flex items-center gap-3">
+        <!-- Botón hamburger — solo mobile -->
+        <button
+          @click="toggleSidebar"
+          class="md:hidden p-2 rounded-lg hover:bg-blue-900 text-white mr-1"
+          aria-label="Abrir menú"
+        >
+          <i class="pi pi-bars text-lg"></i>
+        </button>
+
         <div class="flex items-center gap-3">
           <img src="@/assets/icon-reqflow.png" alt="ReqFlow" class="h-8 w-8 rounded-lg" />
           <span class="font-semibold text-lg text-white">ReqFlow</span>
         </div>
         <span
           v-if="nombreProyecto"
-          class="text-xs font-medium px-2 py-0.5 rounded"
+          class="hidden sm:inline text-xs font-medium px-2 py-0.5 rounded"
           style="background:rgba(255,255,255,0.12);color:rgba(191,219,254,0.9)"
         >
           {{ nombreProyecto }}
         </span>
       </div>
 
-      <div class="flex items-center gap-3">
-        <div class="flex items-center gap-2 text-sm" style="color:rgba(191,219,254,0.9)">
+      <div class="flex items-center gap-2 md:gap-3">
+        <div class="hidden sm:flex items-center gap-2 text-sm" style="color:rgba(191,219,254,0.9)">
           <i class="pi pi-user text-xs"></i>
           <span>{{ authStore.user?.nombre || authStore.user?.email || 'Usuario' }}</span>
           <Tag
@@ -116,9 +137,32 @@ function handleLogout() {
       </div>
     </header>
 
-    <div class="flex flex-1 min-h-0">
+    <div class="flex flex-1 min-h-0 relative">
+      <!-- ── Overlay oscuro en mobile ────────────────────────── -->
+      <div
+        v-if="sidebarAbierto"
+        @click="sidebarAbierto = false"
+        class="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+      ></div>
+
       <!-- ── Sidebar ──────────────────────────────────────────── -->
-      <aside class="w-52 shrink-0 flex flex-col pt-3" style="background:#172554">
+      <aside
+        :class="[
+          'fixed inset-y-0 left-0 z-50 w-52 flex flex-col pt-3',
+          'transform transition-transform duration-300 ease-in-out',
+          'md:relative md:translate-x-0 md:flex',
+          sidebarAbierto ? 'translate-x-0' : '-translate-x-full'
+        ]"
+        style="background:#172554"
+      >
+        <!-- Header del sidebar en mobile (para mostrar nombre usuario) -->
+        <div class="sm:hidden px-4 py-3 border-b border-blue-900 mb-1">
+          <div class="flex items-center gap-2 text-sm" style="color:rgba(191,219,254,0.9)">
+            <i class="pi pi-user text-xs"></i>
+            <span class="truncate">{{ authStore.user?.nombre || authStore.user?.email || 'Usuario' }}</span>
+          </div>
+        </div>
+
         <nav class="flex flex-col gap-0.5 px-2">
           <RouterLink
             v-for="item in navItems"
@@ -136,7 +180,7 @@ function handleLogout() {
       </aside>
 
       <!-- ── Contenido (slot) ─────────────────────────────────── -->
-      <main class="flex-1 p-6 overflow-auto">
+      <main class="flex-1 p-4 md:p-6 overflow-auto">
         <slot />
       </main>
     </div>
