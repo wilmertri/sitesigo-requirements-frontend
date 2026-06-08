@@ -1,25 +1,30 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
+import { useThemeStore } from '../stores/theme'
 import { useToast } from 'primevue/usetoast'
 import InputText from 'primevue/inputtext'
 import Password from 'primevue/password'
 import Button from 'primevue/button'
-import Message from 'primevue/message'
 import Toast from 'primevue/toast'
 import IconField from 'primevue/iconfield'
 import InputIcon from 'primevue/inputicon'
 
-const router = useRouter()
-const auth   = useAuthStore()
-const toast  = useToast()
+const router     = useRouter()
+const auth       = useAuthStore()
+const toast      = useToast()
+const themeStore = useThemeStore()
 
-const email        = ref('')
-const password     = ref('')
-const loading      = ref(false)
-const errorGeneral = ref('')
-const errors       = ref({ email: '', password: '' })
+const email    = ref('')
+const password = ref('')
+const loading  = ref(false)
+const error    = ref('')
+const errors   = ref({ email: '', password: '' })
+
+watch([email, password], () => {
+    if (error.value) error.value = ''
+})
 
 function validate() {
     errors.value = { email: '', password: '' }
@@ -30,7 +35,7 @@ function validate() {
 }
 
 async function handleLogin() {
-    errorGeneral.value = ''
+    error.value = ''
     if (!validate()) return
     loading.value = true
     try {
@@ -39,9 +44,9 @@ async function handleLogin() {
         setTimeout(() => router.push('/dashboard'), 600)
     } catch (err) {
         const status = err.response?.status
-        if (status === 401)      errorGeneral.value = 'Correo o contraseña incorrectos'
-        else if (status === 422) errorGeneral.value = 'Datos inválidos. Verifica el correo ingresado.'
-        else                     errorGeneral.value = 'Error al conectar con el servidor. Intenta de nuevo.'
+        if (status === 401)      error.value = 'Correo o contraseña incorrectos'
+        else if (status === 422) error.value = 'Datos inválidos. Verifica el correo ingresado.'
+        else                     error.value = 'Error al conectar con el servidor. Intenta de nuevo.'
     } finally {
         loading.value = false
     }
@@ -143,9 +148,22 @@ async function handleLogin() {
             </div>
 
             <!-- Error general -->
-            <Message v-if="errorGeneral" severity="error" :closable="false">
-              {{ errorGeneral }}
-            </Message>
+            <div
+              v-if="error"
+              class="flex items-center gap-3 p-4 rounded-xl border"
+              :style="themeStore.isDark
+                ? 'background:#7f1d1d;border-color:#991b1b;color:#fca5a5'
+                : 'background:#fee2e2;border-color:#fca5a5;color:#b91c1c'"
+            >
+              <i class="pi pi-exclamation-circle text-lg flex-shrink-0"></i>
+              <div class="flex-1">
+                <p class="font-medium text-sm">Credenciales incorrectas</p>
+                <p class="text-xs mt-0.5 opacity-80">{{ error }}</p>
+              </div>
+              <button @click="error = ''" class="opacity-60 hover:opacity-100">
+                <i class="pi pi-times text-sm"></i>
+              </button>
+            </div>
 
             <!-- Submit -->
             <Button
