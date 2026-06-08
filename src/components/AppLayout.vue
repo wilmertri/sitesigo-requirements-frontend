@@ -1,7 +1,8 @@
 <script setup>
-import { computed, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
+import api from '../services/api'
 import Button from 'primevue/button'
 import Tag from 'primevue/tag'
 
@@ -31,6 +32,23 @@ const navItems = computed(() => {
 
     return items
 })
+
+// Nombre del proyecto del usuario autenticado (para admin)
+const nombreProyecto = ref(null)
+
+watch(
+    () => authStore.user?.proyecto_id,
+    async (proyectoId) => {
+        if (!proyectoId) { nombreProyecto.value = null; return }
+        try {
+            const r = await api.get(`/proyectos/${proyectoId}`)
+            nombreProyecto.value = r.data.nombre
+        } catch {
+            nombreProyecto.value = null
+        }
+    },
+    { immediate: true }
+)
 
 watch(
     () => authStore.user,
@@ -62,9 +80,18 @@ function handleLogout() {
       class="h-14 flex items-center justify-between px-6 shadow-md z-10 shrink-0"
       style="background:#1e3a8a"
     >
-      <div class="flex items-center gap-2">
-        <i class="pi pi-shield text-white text-lg"></i>
-        <span class="text-lg font-black tracking-widest text-white">ReqFlow</span>
+      <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2">
+          <i class="pi pi-shield text-white text-lg"></i>
+          <span class="text-lg font-black tracking-widest text-white">ReqFlow</span>
+        </div>
+        <span
+          v-if="nombreProyecto"
+          class="text-xs font-medium px-2 py-0.5 rounded"
+          style="background:rgba(255,255,255,0.12);color:rgba(191,219,254,0.9)"
+        >
+          {{ nombreProyecto }}
+        </span>
       </div>
 
       <div class="flex items-center gap-3">

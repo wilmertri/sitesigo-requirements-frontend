@@ -156,8 +156,8 @@ onMounted(() => store.cargarUsuarios(proyectoId.value))
         <Column header="Usuario">
           <template #body="{ data }">
             <div>
-              <p class="font-medium text-slate-800">{{ data.nombre || '—' }}</p>
-              <p class="text-xs text-slate-500">{{ data.email }}</p>
+              <div class="font-medium">{{ data.nombre || '—' }}</div>
+              <div class="text-sm text-gray-500">{{ data.email }}</div>
             </div>
           </template>
         </Column>
