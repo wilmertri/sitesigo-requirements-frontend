@@ -81,9 +81,9 @@ function handleLogout() {
       style="background:#1e3a8a"
     >
       <div class="flex items-center gap-3">
-        <div class="flex items-center gap-2">
-          <img src="@/assets/logo-reqflow.png" alt="ReqFlow" class="h-7 w-auto" />
-          <span class="text-lg font-black tracking-widest text-white">ReqFlow</span>
+        <div class="flex items-center gap-3">
+          <img src="@/assets/icon-reqflow.png" alt="ReqFlow" class="h-8 w-8 rounded-lg" />
+          <span class="font-semibold text-lg text-white">ReqFlow</span>
         </div>
         <span
           v-if="nombreProyecto"

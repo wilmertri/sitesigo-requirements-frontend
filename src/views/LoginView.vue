@@ -75,9 +75,9 @@ async function handleLogin() {
       <!-- Encabezado institucional -->
       <div class="flex flex-col items-center text-center mb-8">
         <img
-          src="@/assets/logo-reqflow.png"
+          src="@/assets/icon-reqflow.png"
           alt="ReqFlow"
-          class="h-20 w-auto mb-6 brightness-0 invert"
+          class="h-24 w-24 mb-6 rounded-2xl shadow-2xl"
         />
         <h1 class="text-4xl font-bold text-white mb-3">ReqFlow</h1>
         <p class="text-blue-200 text-lg">Gestión profesional de requerimientos</p>
