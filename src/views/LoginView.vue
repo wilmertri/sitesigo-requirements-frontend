@@ -160,7 +160,7 @@ async function handleLogin() {
                 <p class="font-medium text-sm">Credenciales incorrectas</p>
                 <p class="text-xs mt-0.5 opacity-80">{{ error }}</p>
               </div>
-              <button @click="error = ''" class="opacity-60 hover:opacity-100">
+              <button type="button" @click="error = ''" class="opacity-60 hover:opacity-100">
                 <i class="pi pi-times text-sm"></i>
               </button>
             </div>
