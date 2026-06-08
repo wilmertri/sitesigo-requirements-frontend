@@ -22,9 +22,8 @@ const proyectoId = computed(() => route.params.id)
 
 // ── Dialog ──────────────────────────────────────────────────────────────────
 const dialogVisible = ref(false)
-const email         = ref('')
-const rol           = ref(null)
-const password      = ref('')
+const nuevoUsuario  = ref({ nombre: '', email: '', rol: null, password: '' })
+const errorNombre   = ref('')
 const errorEmail    = ref('')
 const errorRol      = ref('')
 const errorMsg      = ref('')
@@ -58,34 +57,36 @@ const nombreProyecto = computed(() => {
 })
 
 function abrirDialog() {
-    email.value      = ''
-    rol.value        = null
-    password.value   = ''
-    errorEmail.value = ''
-    errorRol.value   = ''
-    errorMsg.value   = ''
+    nuevoUsuario.value  = { nombre: '', email: '', rol: null, password: '' }
+    errorNombre.value   = ''
+    errorEmail.value    = ''
+    errorRol.value      = ''
+    errorMsg.value      = ''
     dialogVisible.value = true
 }
 
 async function agregarUsuario() {
-    errorEmail.value = ''
-    errorRol.value   = ''
-    errorMsg.value   = ''
+    errorNombre.value = ''
+    errorEmail.value  = ''
+    errorRol.value    = ''
+    errorMsg.value    = ''
 
     let valid = true
-    if (!email.value.trim()) { errorEmail.value = 'El email es obligatorio'; valid = false }
-    if (!rol.value)           { errorRol.value   = 'Selecciona un rol'; valid = false }
+    if (!nuevoUsuario.value.nombre.trim()) { errorNombre.value = 'El nombre es obligatorio'; valid = false }
+    if (!nuevoUsuario.value.email.trim())  { errorEmail.value  = 'El email es obligatorio';  valid = false }
+    if (!nuevoUsuario.value.rol)           { errorRol.value    = 'Selecciona un rol';         valid = false }
     if (!valid) return
 
     agregando.value = true
     try {
         await store.agregarUsuario(proyectoId.value, {
-            email:    email.value.trim(),
-            rol:      rol.value,
-            password: password.value.trim() || 'temporal123',
+            nombre:   nuevoUsuario.value.nombre.trim(),
+            email:    nuevoUsuario.value.email.trim(),
+            rol:      nuevoUsuario.value.rol,
+            password: nuevoUsuario.value.password.trim() || undefined,
         })
         dialogVisible.value = false
-        toast.add({ severity: 'success', summary: 'Usuario agregado', detail: email.value.trim(), life: 3000 })
+        toast.add({ severity: 'success', summary: 'Usuario agregado', detail: nuevoUsuario.value.email.trim(), life: 3000 })
     } catch (e) {
         const status = e.response?.status
         const detail = e.response?.data?.detail
@@ -209,10 +210,23 @@ onMounted(() => store.cargarUsuarios(proyectoId.value))
       <div class="flex flex-col gap-5 p-6">
         <div class="flex flex-col gap-1.5">
           <label class="text-sm font-medium text-slate-700">
+            Nombre completo <span class="text-red-500">*</span>
+          </label>
+          <InputText
+            v-model="nuevoUsuario.nombre"
+            placeholder="Ej: Juan Carlos Pérez"
+            :invalid="!!errorNombre"
+            fluid
+          />
+          <small v-if="errorNombre" class="text-red-500 text-xs">{{ errorNombre }}</small>
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <label class="text-sm font-medium text-slate-700">
             Email <span class="text-red-500">*</span>
           </label>
           <InputText
-            v-model="email"
+            v-model="nuevoUsuario.email"
             placeholder="correo@ejemplo.com"
             :invalid="!!errorEmail"
             fluid
@@ -226,7 +240,7 @@ onMounted(() => store.cargarUsuarios(proyectoId.value))
             Rol <span class="text-red-500">*</span>
           </label>
           <Select
-            v-model="rol"
+            v-model="nuevoUsuario.rol"
             :options="opcionesRol"
             option-label="label"
             option-value="value"
@@ -243,7 +257,7 @@ onMounted(() => store.cargarUsuarios(proyectoId.value))
             <span class="text-slate-400 font-normal">(vacío = temporal123)</span>
           </label>
           <InputText
-            v-model="password"
+            v-model="nuevoUsuario.password"
             placeholder="Dejar vacío para usar contraseña temporal"
             fluid
             type="password"

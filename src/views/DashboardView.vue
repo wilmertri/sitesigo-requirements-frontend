@@ -285,20 +285,26 @@ onMounted(() => req.cargarRequerimientos({}))
         @row-click="navegarDetalle"
       >
         <template #empty>
-          <div class="flex flex-col items-center py-16 text-slate-400">
-            <i class="pi pi-inbox text-6xl mb-4 text-slate-300"></i>
-            <p class="text-base font-medium text-slate-500">No hay requerimientos</p>
-            <p class="text-sm mt-1">
+          <div class="flex flex-col items-center justify-center py-20 text-center">
+            <div class="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mb-4">
+              <i class="pi pi-inbox text-4xl" style="color:#93c5fd"></i>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-600 mb-2">
               {{ filtroEstado || filtroTipo || filtroPrioridad
-                ? 'Prueba cambiando los filtros'
-                : 'Crea el primero con el botón "Nuevo Requerimiento"' }}
+                ? 'Sin resultados para los filtros aplicados'
+                : 'No hay requerimientos aún' }}
+            </h3>
+            <p class="text-gray-400 text-sm mb-6 max-w-sm">
+              {{ filtroEstado || filtroTipo || filtroPrioridad
+                ? 'Prueba cambiando o limpiando los filtros'
+                : 'Crea el primer requerimiento del proyecto para empezar a hacer seguimiento' }}
             </p>
             <Button
               v-if="!filtroEstado && !filtroTipo && !filtroPrioridad"
-              label="Nuevo Requerimiento"
+              label="Crear primer requerimiento"
               icon="pi pi-plus"
               size="small"
-              class="mt-4"
+              style="background:linear-gradient(135deg,#1e3a8a,#3b82f6);border:none"
               @click.stop="router.push('/requerimientos/nuevo')"
             />
           </div>
@@ -351,7 +357,7 @@ onMounted(() => req.cargarRequerimientos({}))
               />
               <Button
                 v-if="auth.isAdmin || auth.isSuperAdmin"
-                title="Archivar"
+                title="Archivar requerimiento"
                 icon="pi pi-inbox"
                 text rounded size="small"
                 severity="warn"

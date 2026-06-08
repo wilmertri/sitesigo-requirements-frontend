@@ -10,10 +10,21 @@ const router = useRouter()
 const auth   = useAuthStore()
 
 const ROL_CONFIG = {
-    administrador:  { label: 'Administrador',  bg: '#fef9c3', color: '#854d0e' },
-    funcionario:    { label: 'Funcionario',    bg: '#dbeafe', color: '#1e40af' },
-    equipo_tecnico: { label: 'Equipo Técnico', bg: '#dcfce7', color: '#166534' },
-    equipo:         { label: 'Equipo Técnico', bg: '#dcfce7', color: '#166534' },
+    super_admin:    { label: 'Super Administrador', bg: '#fce7f3', color: '#9d174d' },
+    administrador:  { label: 'Administrador',       bg: '#fef9c3', color: '#854d0e' },
+    funcionario:    { label: 'Funcionario',          bg: '#dbeafe', color: '#1e40af' },
+    equipo_tecnico: { label: 'Equipo Técnico',       bg: '#dcfce7', color: '#166534' },
+    equipo:         { label: 'Equipo Técnico',       bg: '#dcfce7', color: '#166534' },
+}
+
+function formatearRol(rol) {
+    const roles = {
+        'super_admin':    'Super Administrador',
+        'administrador':  'Administrador',
+        'funcionario':    'Funcionario',
+        'equipo_tecnico': 'Equipo Técnico',
+    }
+    return roles[rol] || rol
 }
 
 const rolInfo = computed(() => {
@@ -52,10 +63,7 @@ function cerrarSesion() {
         <template #content>
           <!-- Avatar inicial -->
           <div class="flex items-center gap-4 mb-6 pb-5 border-b border-slate-100">
-            <div
-              class="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold text-white"
-              style="background:#1e3a8a"
-            >
+            <div class="w-16 h-16 rounded-full bg-gradient-to-br from-blue-900 to-blue-600 flex items-center justify-center text-2xl font-bold text-white shadow-lg">
               {{ (auth.user?.nombre || auth.user?.email || 'U')[0].toUpperCase() }}
             </div>
             <div>
