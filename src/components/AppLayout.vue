@@ -5,54 +5,46 @@ import { useAuthStore } from '../stores/auth'
 import Button from 'primevue/button'
 import Tag from 'primevue/tag'
 
-const router = useRouter()
-const route  = useRoute()
-const auth   = useAuthStore()
-
-const proyectoId = computed(() => auth.user?.proyecto_id)
+const router    = useRouter()
+const route     = useRoute()
+const authStore = useAuthStore()
 
 const navItems = computed(() => {
-    if (auth.isSuperAdmin) {
-        return [
-            { label: 'Dashboard',           icon: 'pi pi-home',        path: '/dashboard' },
-            { label: 'Proyectos',           icon: 'pi pi-sitemap',     path: '/proyectos' },
-            { label: 'Nuevo Requerimiento', icon: 'pi pi-plus-circle', path: '/requerimientos/nuevo' },
-            { label: 'Perfil',              icon: 'pi pi-user',        path: '/perfil' },
-        ]
-    }
-    if (auth.isAdmin) {
-        const items = [
-            { label: 'Dashboard',           icon: 'pi pi-home',        path: '/dashboard' },
-            { label: 'Nuevo Requerimiento', icon: 'pi pi-plus-circle', path: '/requerimientos/nuevo' },
-            { label: 'Perfil',              icon: 'pi pi-user',        path: '/perfil' },
-        ]
-        if (proyectoId.value) {
-            items.splice(1, 0, {
-                label: 'Usuarios',
-                icon:  'pi pi-users',
-                path:  `/proyectos/${proyectoId.value}/usuarios`,
-            })
-        }
-        return items
-    }
-    // Funcionario / equipo_tecnico
-    return [
-        { label: 'Dashboard',           icon: 'pi pi-home',        path: '/dashboard' },
-        { label: 'Nuevo Requerimiento', icon: 'pi pi-plus-circle', path: '/requerimientos/nuevo' },
-        { label: 'Perfil',              icon: 'pi pi-user',        path: '/perfil' },
+    const items = [
+        { label: 'Dashboard', icon: 'pi pi-home', path: '/dashboard' },
     ]
+
+    if (authStore.isSuperAdmin) {
+        items.push({ label: 'Proyectos', icon: 'pi pi-sitemap', path: '/proyectos' })
+    }
+
+    if (authStore.isAdmin && authStore.user?.proyecto_id) {
+        items.push({
+            label: 'Usuarios',
+            icon:  'pi pi-users',
+            path:  `/proyectos/${authStore.user.proyecto_id}/usuarios`,
+        })
+    }
+
+    items.push({ label: 'Nuevo Requerimiento', icon: 'pi pi-plus-circle', path: '/requerimientos/nuevo' })
+    items.push({ label: 'Perfil',              icon: 'pi pi-user',        path: '/perfil' })
+
+    return items
 })
 
 function rolTag() {
-    if (auth.isSuperAdmin) return { value: 'Super Admin', severity: 'danger' }
-    if (auth.isAdmin)      return { value: 'Admin',       severity: 'warn' }
+    if (authStore.isSuperAdmin) return { value: 'Super Admin', severity: 'danger' }
+    if (authStore.isAdmin)      return { value: 'Admin',       severity: 'warn' }
     return null
 }
 
-function isActive(path) { return route.path === path || route.path.startsWith(path + '/') && path !== '/dashboard' }
+function isActive(path) {
+    if (path === '/dashboard') return route.path === '/dashboard'
+    return route.path === path || route.path.startsWith(path + '/')
+}
 
 function handleLogout() {
-    auth.logout()
+    authStore.logout()
     router.push('/login')
 }
 </script>
@@ -72,7 +64,7 @@ function handleLogout() {
       <div class="flex items-center gap-3">
         <div class="flex items-center gap-2 text-sm" style="color:rgba(191,219,254,0.9)">
           <i class="pi pi-user text-xs"></i>
-          <span>{{ auth.user?.nombre || auth.user?.email || 'Usuario' }}</span>
+          <span>{{ authStore.user?.nombre || authStore.user?.email || 'Usuario' }}</span>
           <Tag
             v-if="rolTag()"
             :value="rolTag().value"
