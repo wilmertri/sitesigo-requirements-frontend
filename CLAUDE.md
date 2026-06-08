@@ -6,8 +6,9 @@ Independiente de cualquier cliente especifico.
 Interface web para que Administradores, Funcionarios
 y Equipo Tecnico gestionen requerimientos de software.
 
-## Repositorio relacionado
-Backend: https://github.com/wilmertri/sitesigo-requirements
+## URLs
+Frontend produccion: https://reqflow-requirements.vercel.app
+Backend repo: https://github.com/wilmertri/sitesigo-requirements
 API en produccion: https://sitesigo-requirements-production.up.railway.app
 
 ## Stack
@@ -92,18 +93,21 @@ Lee CLAUDE.md e implementa: [nombre de la vista]"
 - Variables de entorno (.env.development / .env.production)
 - Axios instance con interceptores JWT (src/services/api.js)
 - Store de autenticacion Pinia (src/stores/auth.js)
+- Store de requerimientos Pinia (src/stores/requirements.js)
 - Router con navigation guard (Vue Router 5 API)
+- AppLayout compartido (header + sidebar)
+- useBadges composable (badges de estado y prioridad)
 - Vista Login completa con PrimeVue + gradiente azul
+- Vista Dashboard con DataTable, filtros y badges
+- Vista Nuevo Requerimiento con formulario y validacion
+- Vista Detalle con panel admin (cambiar estado, archivar)
+- Vista Perfil con datos del usuario y logout
+- vercel.json para SPA routing
+- Deploy en Vercel: https://reqflow-requirements.vercel.app
 
 ### Pendiente
 - Vista Registro
-- Vista Dashboard (lista de requerimientos)
-- Vista Nuevo Requerimiento
-- Vista Detalle Requerimiento
-- Vista Perfil
-- Store de requerimientos (Pinia)
 - Dockerfile frontend
-- Deploy en Vercel
 
 ## Notas importantes
 - JWT token expira en 30 minutos

@@ -1,50 +1,32 @@
-# sitesigo-requirements-frontend
+# ReqFlow — Frontend
 
-This template should help get you started developing with Vue 3 in Vite.
+Herramienta SaaS para gestionar requerimientos de software.
 
-## Recommended IDE Setup
+**Produccion:** https://reqflow-requirements.vercel.app
+**API backend:** https://sitesigo-requirements-production.up.railway.app
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+## Stack
 
-## Recommended Browser Setup
+- Vue 3 (Composition API + script setup)
+- Vue Router 5
+- Pinia 3
+- PrimeVue 4 con tema Aura
+- Tailwind CSS 4
+- Axios
+- Vite 8
 
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd)
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
+## Desarrollo local
 
 ```sh
 npm install
+npm run dev       # localhost:5173
+npm run build     # build de produccion
+npm run test:unit # tests con Vitest
 ```
 
-### Compile and Hot-Reload for Development
+## Variables de entorno
 
-```sh
-npm run dev
 ```
-
-### Compile and Minify for Production
-
-```sh
-npm run build
-```
-
-### Run Unit Tests with [Vitest](https://vitest.dev/)
-
-```sh
-npm run test:unit
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
+VITE_API_URL=http://localhost:8000        # desarrollo
+VITE_API_URL=https://sitesigo-requirements-production.up.railway.app  # produccion
 ```
