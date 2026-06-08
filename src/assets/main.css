@@ -17,111 +17,246 @@ body {
     font-family: 'Inter', sans-serif;
 }
 
-/* ═══ DARK MODE ═══ */
-.dark-mode,
-.dark-mode * {
-    --tw-text-opacity: 1;
-}
+/* ═══════════════════════════════════
+   DARK MODE — Contraste bien definido
+   ═══════════════════════════════════ */
 
-/* Fondo general */
+/* Fondo principal del contenido */
 .dark-mode body,
 .dark-mode #app {
+    background-color: #0f172a;
+}
+
+/* Area de contenido principal */
+.dark-mode .bg-gray-50,
+.dark-mode .bg-gray-100,
+.dark-mode [style*="background-color: rgb(248"] {
     background-color: #0f172a !important;
 }
 
-/* Contenido principal */
-.dark-mode .main-content,
-.dark-mode [class*="bg-gray-50"],
-.dark-mode [class*="bg-gray-100"] {
-    background-color: #0f172a !important;
-}
-
-/* Cards y superficies blancas */
-.dark-mode [class*="bg-white"] {
+/* Cards, tablas y superficies */
+.dark-mode .bg-white {
     background-color: #1e293b !important;
 }
 
-/* Todo el texto debe ser claro */
+/* ── TEXTO ── */
+/* Titulos y texto principal */
 .dark-mode h1,
 .dark-mode h2,
 .dark-mode h3,
-.dark-mode h4,
+.dark-mode .text-gray-800,
+.dark-mode .text-gray-900 {
+    color: #f1f5f9 !important;
+}
+
+/* Texto secundario */
 .dark-mode p,
-.dark-mode span,
+.dark-mode span:not([class*="bg-"]),
 .dark-mode td,
-.dark-mode th,
+.dark-mode .text-gray-600,
+.dark-mode .text-gray-700 {
+    color: #cbd5e1 !important;
+}
+
+/* Texto terciario */
+.dark-mode .text-gray-500,
+.dark-mode .text-gray-400,
 .dark-mode label,
-.dark-mode div {
-    color: #e2e8f0 !important;
-}
-
-/* Excepciones — badges de color mantienen su color */
-.dark-mode [class*="bg-red"],
-.dark-mode [class*="bg-green"],
-.dark-mode [class*="bg-yellow"],
-.dark-mode [class*="bg-blue"],
-.dark-mode [class*="bg-orange"] {
-    color: inherit !important;
-}
-
-/* Dropdowns y selects de PrimeVue */
-.dark-mode .p-dropdown,
-.dark-mode .p-dropdown-panel,
-.dark-mode .p-dropdown-item {
-    background-color: #1e293b !important;
-    color: #e2e8f0 !important;
-    border-color: #334155 !important;
-}
-
-/* Tabla */
-.dark-mode table,
-.dark-mode thead,
-.dark-mode tbody,
-.dark-mode tr {
-    background-color: #1e293b !important;
-    border-color: #334155 !important;
-}
-
 .dark-mode th {
-    background-color: #0f172a !important;
     color: #94a3b8 !important;
 }
 
-.dark-mode tr:hover {
+/* ── BADGES — contraste forzado ── */
+/* Badge Alta prioridad — rojo oscuro */
+.dark-mode [class*="bg-red-100"] {
+    background-color: #7f1d1d !important;
+}
+.dark-mode [class*="text-red"] {
+    color: #fca5a5 !important;
+}
+
+/* Badge Media prioridad — amarillo oscuro */
+.dark-mode [class*="bg-yellow-100"],
+.dark-mode [class*="bg-amber-100"] {
+    background-color: #78350f !important;
+}
+.dark-mode [class*="text-yellow"],
+.dark-mode [class*="text-amber"] {
+    color: #fcd34d !important;
+}
+
+/* Badge Baja prioridad — verde oscuro */
+.dark-mode [class*="bg-green-100"] {
+    background-color: #14532d !important;
+}
+.dark-mode [class*="text-green"] {
+    color: #86efac !important;
+}
+
+/* Badge Estado Nuevo — azul oscuro */
+.dark-mode [class*="bg-blue-100"] {
+    background-color: #1e3a5f !important;
+}
+.dark-mode [class*="text-blue"] {
+    color: #93c5fd !important;
+}
+
+/* Badge En desarrollo — naranja oscuro */
+.dark-mode [class*="bg-orange-100"] {
+    background-color: #7c2d12 !important;
+}
+.dark-mode [class*="text-orange"] {
+    color: #fdba74 !important;
+}
+
+/* Badge Super Admin — rojo */
+.dark-mode .bg-red-500 {
+    background-color: #dc2626 !important;
+    color: #ffffff !important;
+}
+
+/* ── SIDEBAR — se mantiene navy oscuro ── */
+.dark-mode nav,
+.dark-mode aside,
+.dark-mode .bg-blue-950 {
+    background-color: #020617 !important;
+}
+
+/* Items del sidebar */
+.dark-mode nav span,
+.dark-mode aside span,
+.dark-mode nav a {
+    color: #94a3b8 !important;
+}
+
+/* Item activo del sidebar */
+.dark-mode .bg-blue-600 {
+    background-color: #2563eb !important;
+}
+.dark-mode .bg-blue-600 span,
+.dark-mode .bg-blue-600 i {
+    color: #ffffff !important;
+}
+
+/* ── TABLA ── */
+.dark-mode table {
+    background-color: #1e293b !important;
+}
+
+.dark-mode thead tr {
+    background-color: #0f172a !important;
+    border-bottom: 1px solid #334155 !important;
+}
+
+.dark-mode th {
+    color: #64748b !important;
     background-color: #0f172a !important;
 }
 
-/* Inputs */
-.dark-mode input,
+.dark-mode tbody tr {
+    border-bottom: 1px solid #334155 !important;
+}
+
+.dark-mode tbody tr:hover {
+    background-color: #0f172a !important;
+}
+
+/* ── FILTROS Y DROPDOWNS ── */
+.dark-mode .p-dropdown,
+.dark-mode .p-select {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+    color: #e2e8f0 !important;
+}
+
+.dark-mode .p-dropdown-panel,
+.dark-mode .p-select-panel {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+}
+
+.dark-mode .p-dropdown-item,
+.dark-mode .p-select-option {
+    color: #e2e8f0 !important;
+}
+
+.dark-mode .p-dropdown-item:hover,
+.dark-mode .p-select-option:hover {
+    background-color: #0f172a !important;
+}
+
+/* ── INPUTS Y TEXTAREAS ── */
+.dark-mode input:not([type="checkbox"]),
 .dark-mode textarea {
     background-color: #0f172a !important;
     color: #e2e8f0 !important;
     border-color: #334155 !important;
 }
 
-/* Bordes */
-.dark-mode [class*="border-gray"] {
+.dark-mode input::placeholder,
+.dark-mode textarea::placeholder {
+    color: #475569 !important;
+}
+
+/* ── BORDES ── */
+.dark-mode .border-gray-100,
+.dark-mode .border-gray-200 {
     border-color: #334155 !important;
 }
 
-/* Cards de métricas */
-.dark-mode [class*="border-l-4"] {
+/* ── HEADER ── */
+.dark-mode header,
+.dark-mode .bg-blue-900 {
+    background-color: #020617 !important;
+}
+
+/* ── CARDS DE METRICAS ── */
+.dark-mode .border-l-4 {
     background-color: #1e293b !important;
 }
 
-/* Texto secundario */
-.dark-mode [class*="text-gray-500"],
-.dark-mode [class*="text-gray-400"] {
-    color: #94a3b8 !important;
+/* Texto en cards de metricas */
+.dark-mode .border-l-4 p,
+.dark-mode .border-l-4 span {
+    color: #cbd5e1 !important;
 }
 
-/* Sidebar activo sigue en azul */
-.dark-mode .bg-blue-600 {
-    background-color: #2563eb !important;
+.dark-mode .border-l-4 .text-3xl {
+    color: #f1f5f9 !important;
 }
 
-/* Header y sidebar permanecen navy oscuro */
-.dark-mode .bg-blue-950,
-.dark-mode nav {
-    background-color: #020617 !important;
+/* ── FORMULARIOS ── */
+.dark-mode .rounded-2xl.shadow-lg,
+.dark-mode .rounded-2xl.shadow-sm {
+    background-color: #1e293b !important;
+}
+
+.dark-mode [class*="bg-gradient-to-r"] {
+    opacity: 1 !important;
+}
+
+.dark-mode .font-semibold {
+    color: #e2e8f0 !important;
+}
+
+/* ── DIALOGS ── */
+.dark-mode .p-dialog {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+}
+
+.dark-mode .p-dialog-header {
+    background-color: #1e293b !important;
+    color: #f1f5f9 !important;
+    border-color: #334155 !important;
+}
+
+.dark-mode .p-dialog-content {
+    background-color: #1e293b !important;
+    color: #cbd5e1 !important;
+}
+
+.dark-mode .p-dialog-footer {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
 }
