@@ -1,4 +1,5 @@
 <script setup>
+import { computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import Button from 'primevue/button'
@@ -8,13 +9,47 @@ const router = useRouter()
 const route  = useRoute()
 const auth   = useAuthStore()
 
-const navItems = [
-    { label: 'Dashboard',          icon: 'pi pi-home',        path: '/dashboard' },
-    { label: 'Nuevo Requerimiento', icon: 'pi pi-plus-circle', path: '/requerimientos/nuevo' },
-    { label: 'Perfil',             icon: 'pi pi-user',        path: '/perfil' },
-]
+const proyectoId = computed(() => auth.user?.proyecto_id)
 
-function isActive(path) { return route.path === path }
+const navItems = computed(() => {
+    if (auth.isSuperAdmin) {
+        return [
+            { label: 'Dashboard',           icon: 'pi pi-home',        path: '/dashboard' },
+            { label: 'Proyectos',           icon: 'pi pi-sitemap',     path: '/proyectos' },
+            { label: 'Nuevo Requerimiento', icon: 'pi pi-plus-circle', path: '/requerimientos/nuevo' },
+            { label: 'Perfil',              icon: 'pi pi-user',        path: '/perfil' },
+        ]
+    }
+    if (auth.isAdmin) {
+        const items = [
+            { label: 'Dashboard',           icon: 'pi pi-home',        path: '/dashboard' },
+            { label: 'Nuevo Requerimiento', icon: 'pi pi-plus-circle', path: '/requerimientos/nuevo' },
+            { label: 'Perfil',              icon: 'pi pi-user',        path: '/perfil' },
+        ]
+        if (proyectoId.value) {
+            items.splice(1, 0, {
+                label: 'Usuarios',
+                icon:  'pi pi-users',
+                path:  `/proyectos/${proyectoId.value}/usuarios`,
+            })
+        }
+        return items
+    }
+    // Funcionario / equipo_tecnico
+    return [
+        { label: 'Dashboard',           icon: 'pi pi-home',        path: '/dashboard' },
+        { label: 'Nuevo Requerimiento', icon: 'pi pi-plus-circle', path: '/requerimientos/nuevo' },
+        { label: 'Perfil',              icon: 'pi pi-user',        path: '/perfil' },
+    ]
+})
+
+function rolTag() {
+    if (auth.isSuperAdmin) return { value: 'Super Admin', severity: 'danger' }
+    if (auth.isAdmin)      return { value: 'Admin',       severity: 'warn' }
+    return null
+}
+
+function isActive(path) { return route.path === path || route.path.startsWith(path + '/') && path !== '/dashboard' }
 
 function handleLogout() {
     auth.logout()
@@ -38,7 +73,12 @@ function handleLogout() {
         <div class="flex items-center gap-2 text-sm" style="color:rgba(191,219,254,0.9)">
           <i class="pi pi-user text-xs"></i>
           <span>{{ auth.user?.nombre || auth.user?.email || 'Usuario' }}</span>
-          <Tag v-if="auth.isAdmin" value="Admin" severity="warn" class="text-xs py-0" />
+          <Tag
+            v-if="rolTag()"
+            :value="rolTag().value"
+            :severity="rolTag().severity"
+            class="text-xs py-0"
+          />
         </div>
         <Button
           icon="pi pi-sign-out"

@@ -9,12 +9,6 @@ const routes = [
         meta: { requiresAuth: false }
     },
     {
-        path: '/registro',
-        name: 'Registro',
-        component: () => import('../views/RegistroView.vue'),
-        meta: { requiresAuth: false }
-    },
-    {
         path: '/',
         redirect: '/dashboard'
     },
@@ -41,7 +35,19 @@ const routes = [
         name: 'Perfil',
         component: () => import('../views/PerfilView.vue'),
         meta: { requiresAuth: true }
-    }
+    },
+    {
+        path: '/proyectos',
+        name: 'Proyectos',
+        component: () => import('../views/ProyectosView.vue'),
+        meta: { requiresAuth: true, requiresSuperAdmin: true }
+    },
+    {
+        path: '/proyectos/:id/usuarios',
+        name: 'ProyectoUsuarios',
+        component: () => import('../views/ProyectoUsuariosView.vue'),
+        meta: { requiresAuth: true }
+    },
 ]
 
 const router = createRouter({
@@ -51,12 +57,9 @@ const router = createRouter({
 
 router.beforeEach((to) => {
     const auth = useAuthStore()
-    if (to.meta.requiresAuth && !auth.isAuthenticated) {
-        return '/login'
-    }
-    if (!to.meta.requiresAuth && auth.isAuthenticated && to.path !== '/registro') {
-        return '/dashboard'
-    }
+    if (to.meta.requiresAuth && !auth.isAuthenticated) return '/login'
+    if (!to.meta.requiresAuth && auth.isAuthenticated) return '/dashboard'
+    if (to.meta.requiresSuperAdmin && !auth.isSuperAdmin) return '/dashboard'
 })
 
 export default router
