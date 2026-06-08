@@ -16,3 +16,61 @@ body {
     background-color: var(--reqflow-bg);
     font-family: 'Inter', sans-serif;
 }
+
+/* ── Dark mode ────────────────────────────────────────────── */
+.dark-mode {
+    --reqflow-bg:      #0f172a;
+    --reqflow-surface: #1e293b;
+    --reqflow-navy:    #1e40af;
+}
+
+.dark-mode body {
+    background-color: #0f172a;
+    color: #e2e8f0;
+}
+
+.dark-mode .bg-blue-950 {
+    background-color: #020617 !important;
+}
+
+.dark-mode .bg-white {
+    background-color: #1e293b !important;
+    color: #e2e8f0 !important;
+}
+
+.dark-mode .text-gray-800,
+.dark-mode .text-gray-700,
+.dark-mode .text-gray-600 {
+    color: #cbd5e1 !important;
+}
+
+.dark-mode .text-gray-500,
+.dark-mode .text-gray-400 {
+    color: #94a3b8 !important;
+}
+
+.dark-mode .border-gray-200,
+.dark-mode .border-gray-100 {
+    border-color: #334155 !important;
+}
+
+.dark-mode input,
+.dark-mode textarea,
+.dark-mode select {
+    background-color: #0f172a !important;
+    color: #e2e8f0 !important;
+    border-color: #334155 !important;
+}
+
+.dark-mode table {
+    background-color: #1e293b !important;
+}
+
+.dark-mode tr:hover {
+    background-color: #0f172a !important;
+}
+
+.dark-mode .bg-gray-50,
+.dark-mode .bg-gray-100 {
+    background-color: #0f172a !important;
+}

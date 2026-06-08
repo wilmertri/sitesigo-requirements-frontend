@@ -2,13 +2,15 @@
 import { computed, ref, watch, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
+import { useThemeStore } from '../stores/theme'
 import api from '../services/api'
 import Button from 'primevue/button'
 import Tag from 'primevue/tag'
 
-const router    = useRouter()
-const route     = useRoute()
-const authStore = useAuthStore()
+const router     = useRouter()
+const route      = useRoute()
+const authStore  = useAuthStore()
+const themeStore = useThemeStore()
 
 const navItems = computed(() => {
     const items = [
@@ -116,6 +118,15 @@ onUnmounted(() => window.removeEventListener('resize', onResize))
       </div>
 
       <div class="flex items-center gap-2 md:gap-3">
+        <!-- Toggle dark mode -->
+        <button
+          @click="themeStore.toggleDark()"
+          class="p-2 rounded-lg transition-colors hover:bg-white/10 text-white"
+          :title="themeStore.isDark ? 'Modo claro' : 'Modo oscuro'"
+        >
+          <i :class="themeStore.isDark ? 'pi pi-sun' : 'pi pi-moon'" class="text-lg"></i>
+        </button>
+
         <div class="hidden sm:flex items-center gap-2 text-sm" style="color:rgba(191,219,254,0.9)">
           <i class="pi pi-user text-xs"></i>
           <span>{{ authStore.user?.nombre || authStore.user?.email || 'Usuario' }}</span>
