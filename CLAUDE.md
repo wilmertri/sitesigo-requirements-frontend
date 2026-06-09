@@ -29,12 +29,15 @@ API en produccion: https://sitesigo-requirements-production.up.railway.app
 - Equipo tecnico: ve todos, agrega comentarios
 
 ## Vistas principales
-- /login              Login con email y password
-- /registro           Registro de nuevo usuario
-- /dashboard          Lista de requerimientos con filtros
-- /requerimientos/nuevo    Crear requerimiento
-- /requerimientos/:id      Detalle del requerimiento
-- /perfil             Datos del usuario actual
+- /login                          Login con email y password
+- /registro                       Registro de nuevo usuario
+- /dashboard                      Lista de requerimientos con filtros
+- /requerimientos/nuevo            Crear requerimiento
+- /requerimientos/:id              Detalle del requerimiento
+- /perfil                         Datos del usuario actual
+- /proyectos                      Gestion de proyectos (super_admin)
+- /proyectos/:id/usuarios         Usuarios de un proyecto (admin+)
+- /configuracion/proyecto/:id     Campos y estados por proyecto (super_admin)
 
 ## Variables de entorno
 VITE_API_URL=http://localhost:8000   (desarrollo)
@@ -43,7 +46,7 @@ VITE_API_URL=https://sitesigo-requirements-production.up.railway.app (produccion
 ## Convenios de codigo
 - Composition API con script setup en todos los componentes
 - Un componente por archivo
-- Stores Pinia para: auth, requerimientos
+- Stores Pinia para: auth, requerimientos, theme, config, projects
 - Axios instance con interceptor para JWT token
 - Nunca hardcodear URLs — siempre usar VITE_API_URL
 - Nombres de componentes en PascalCase
@@ -54,6 +57,7 @@ VITE_API_URL=https://sitesigo-requirements-production.up.railway.app (produccion
 src/
   views/          paginas principales (una por ruta)
   components/     componentes reutilizables
+  composables/    logica reutilizable (useBadges)
   stores/         estado global con Pinia
   services/       llamadas HTTP con Axios
   router/         configuracion de rutas
@@ -95,17 +99,33 @@ Lee CLAUDE.md e implementa: [nombre de la vista]"
 - Store de autenticacion Pinia (src/stores/auth.js)
 - Store de requerimientos Pinia (src/stores/requirements.js)
 - Store de tema dark/light (src/stores/theme.js) con persistencia localStorage
+- Store de configuracion (src/stores/config.js) — campos y estados por proyecto
+- Store de proyectos (src/stores/projects.js)
 - Router con navigation guard (Vue Router 5 API)
 - AppLayout compartido (header + sidebar)
   - Sidebar colapsable en mobile con hamburger y overlay
   - Boton dark mode toggle (luna/sol) en header
+  - Link "Usuarios" en sidebar para admin con proyecto asignado
 - useBadges composable con soporte dark/light mode
 - Vista Login completa — error persistente, sin recarga en 401
+- Vista Registro — nombre, email, password, rol; redirige a /login
 - Vista Dashboard con DataTable, filtros, badges y contadores animados
-- Vista Nuevo Requerimiento con formulario y validacion
-- Vista Detalle con panel admin (cambiar estado, archivar)
+- Vista Nuevo Requerimiento — grid 2 columnas ancho completo, boton a la derecha
+- Vista Detalle con panel admin (cambiar estado, archivar, estado del proyecto)
+  - Panel "Campos adicionales" con edicion inline para admin/autor
 - Vista Perfil con datos del usuario y logout
 - Vista 404 personalizada con branding ReqFlow
+- Vista Proyectos (super_admin) con lista y crear proyecto
+- Vista ProyectoUsuarios — gestionar usuarios de un proyecto
+- Vista ConfiguracionProyecto (super_admin)
+  - Tabla de campos configurables con badge de tipo y flag obligatorio
+  - Tabla de estados del proyecto con color, orden y flag terminal
+  - Dialog "Nuevo campo": nombre, clave auto-generada, tipo, obligatorio, opciones para lista
+  - Dialog "Nuevo estado": color picker nativo, orden, es_terminal, preview del badge
+- Componente CamposConfigurables — renderizador dinamico de campos por proyecto
+  - Grid 4 columnas en desktop: texto = ancho completo, resto = 1 col
+  - Soporte readonly (modo detalle) y editable (modo nuevo/edicion)
+  - Campo calculado (dias habiles) recalcula al cambiar fechas
 - Dark mode completo: sidebar, cards, tabla, badges, inputs, dialogs
 - Responsive mobile: cards 2x2, tabla con scroll horizontal,
   formularios en columna unica en mobile
@@ -113,8 +133,30 @@ Lee CLAUDE.md e implementa: [nombre de la vista]"
 - Deploy en Vercel: https://reqflow-requirements.vercel.app
 
 ### Pendiente
-- Vista Registro
 - Dockerfile frontend
+
+## Campos configurables por proyecto (SITESIGO)
+El backend expone endpoints para configurar campos y estados
+adicionales por proyecto. El frontend los consume via configStore.
+
+### Endpoints
+- GET  /proyectos/:id/campos           lista de campos configurados
+- POST /proyectos/:id/campos           crear campo
+- GET  /proyectos/:id/estados          lista de estados configurados
+- POST /proyectos/:id/estados          crear estado
+- GET  /proyectos/:id/dias-habiles     calcula dias entre dos fechas
+- PUT  /requerimientos/:id/valores     guarda valores adicionales
+
+### Tipos de campo soportados
+- texto     → InputText, ancho completo (md:col-span-4)
+- numero    → InputNumber, 1 columna
+- lista     → Select con opciones configuradas, 1 columna
+- fecha     → input[type=date] nativo con estilos PrimeVue, 1 columna
+- calculado → readonly, muestra dias habiles entre fecha_inicio y fecha_final
+
+### Cache en configStore
+Los campos y estados se cachean por proyectoId.
+Llamar configStore.invalidar(proyectoId) tras crear/editar campos o estados.
 
 ## Notas importantes
 - JWT token expira en 30 minutos
@@ -122,18 +164,39 @@ Lee CLAUDE.md e implementa: [nombre de la vista]"
 - Los endpoints requieren header Authorization: Bearer token
 - POST /auth/token usa form-data no JSON (OAuth2)
 - Navigation guards usan return en lugar de next() (Vue Router 5)
+- Roles disponibles: super_admin, administrador, funcionario, equipo_tecnico
 
 ## Convenciones y errores comunes
 
 ### Interceptores de Axios
-El interceptor de 401 en src/services/api.js
-excluye /auth/token para evitar que un login
-fallido cause recarga de pagina.
+El interceptor de 401 en src/services/api.js excluye endpoints publicos
+para evitar que errores normales causen recarga de pagina.
 
-Si agregas nuevos endpoints publicos que
-puedan devolver 401 sin ser errores de sesion,
-agregalos a la lista de exclusiones:
+Endpoints excluidos del redirect a /login:
 
 const esEndpointPublico =
     error.config?.url?.includes('/auth/token') ||
     error.config?.url?.includes('/auth/registro')
+
+Si agregas nuevos endpoints publicos que puedan devolver 401,
+agregalos a esta lista.
+
+### useBadges y dark mode
+useBadges acepta un isDarkRef (computed(() => themeStore.isDark)).
+Los estilos de badge son inline, por lo que NO pueden ser
+sobreescritos por CSS global. El composable genera los colores
+correctos para cada modo directamente en el style string.
+
+### CamposConfigurables en dark mode
+El input[type=date] nativo requiere estilos inline via inputFechaStyle()
+porque Tailwind no puede estilizar elementos nativos del navegador
+en todos los contextos.
+
+### Commits en PowerShell
+Usar here-string de PowerShell para mensajes multilinea.
+Evitar apostrofes/comillas simples dentro del mensaje:
+
+$msg = @'
+mensaje aqui
+'@
+git commit -m $msg
