@@ -49,6 +49,12 @@ const routes = [
         meta: { requiresAuth: true }
     },
     {
+        path: '/configuracion/proyecto/:id',
+        name: 'ConfiguracionProyecto',
+        component: () => import('../views/ConfiguracionProyectoView.vue'),
+        meta: { requiresAuth: true, requiresSuperAdmin: true }
+    },
+    {
         path: '/:pathMatch(.*)*',
         name: 'NotFound',
         component: () => import('../views/NotFoundView.vue'),

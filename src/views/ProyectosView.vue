@@ -131,15 +131,25 @@ onMounted(() => store.cargarProyectos())
           </template>
         </Column>
 
-        <Column header="Acciones" style="width:9rem">
+        <Column header="Acciones" style="width:16rem">
           <template #body="{ data }">
-            <Button
-              label="Ver usuarios"
-              icon="pi pi-users"
-              size="small"
-              text
-              @click="router.push(`/proyectos/${data.id}/usuarios`)"
-            />
+            <div class="flex gap-1">
+              <Button
+                label="Usuarios"
+                icon="pi pi-users"
+                size="small"
+                text
+                @click="router.push(`/proyectos/${data.id}/usuarios`)"
+              />
+              <Button
+                label="Configurar"
+                icon="pi pi-cog"
+                size="small"
+                text
+                severity="secondary"
+                @click="router.push(`/configuracion/proyecto/${data.id}`)"
+              />
+            </div>
           </template>
         </Column>
       </DataTable>
