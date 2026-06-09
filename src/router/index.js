@@ -9,6 +9,12 @@ const routes = [
         meta: { requiresAuth: false }
     },
     {
+        path: '/registro',
+        name: 'Registro',
+        component: () => import('../views/RegistroView.vue'),
+        meta: { requiresAuth: false }
+    },
+    {
         path: '/',
         redirect: '/dashboard'
     },

@@ -176,6 +176,15 @@ async function handleLogin() {
               class="mt-1"
               style="background:linear-gradient(135deg,#1e3a8a,#3b82f6) !important;border:none !important"
             />
+
+            <!-- Link a registro -->
+            <p class="text-center text-sm text-gray-500 mt-1">
+              ¿No tienes cuenta?
+              <RouterLink to="/registro" class="font-semibold hover:underline" style="color:#1e3a8a">
+                Registrarse
+              </RouterLink>
+            </p>
+
           </form>
         </div>
       </div>
