@@ -3,11 +3,13 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { useThemeStore } from '../stores/theme'
+import { useConfigStore } from '../stores/config'
 import { useConfirm } from 'primevue/useconfirm'
 import { useToast } from 'primevue/usetoast'
 import { useBadges } from '../composables/useBadges'
 import api from '../services/api'
 import AppLayout from '../components/AppLayout.vue'
+import CamposConfigurables from '../components/CamposConfigurables.vue'
 import Select from 'primevue/select'
 import Button from 'primevue/button'
 import ProgressSpinner from 'primevue/progressspinner'
@@ -15,13 +17,14 @@ import Message from 'primevue/message'
 import Toast from 'primevue/toast'
 import ConfirmDialog from 'primevue/confirmdialog'
 
-const router     = useRouter()
-const route      = useRoute()
-const auth       = useAuthStore()
-const confirm    = useConfirm()
-const toast      = useToast()
-const themeStore = useThemeStore()
-const darkRef    = computed(() => themeStore.isDark)
+const router      = useRouter()
+const route       = useRoute()
+const auth        = useAuthStore()
+const confirm     = useConfirm()
+const toast       = useToast()
+const themeStore  = useThemeStore()
+const configStore = useConfigStore()
+const darkRef     = computed(() => themeStore.isDark)
 const { estadoLabel, estadoStyle, prioridadLabel, prioridadStyle } = useBadges(darkRef)
 
 const requerimiento   = ref(null)
@@ -29,6 +32,58 @@ const loading         = ref(true)
 const error           = ref(null)
 const nuevoEstado     = ref(null)
 const cambiandoEstado = ref(false)
+
+// ── Campos adicionales ────────────────────────────────────────────────────────
+const editandoValores  = ref(false)
+const valoresEdit      = ref({})
+const guardandoValores = ref(false)
+
+const puedeEditarValores = computed(() =>
+    auth.isAdmin || auth.isSuperAdmin ||
+    requerimiento.value?.autor_email === auth.user?.email
+)
+
+function onUpdateValores(v) { valoresEdit.value = v }
+
+function abrirEdicionValores() {
+    valoresEdit.value  = { ...(requerimiento.value?.valores_adicionales ?? {}) }
+    editandoValores.value = true
+}
+
+async function guardarValores() {
+    guardandoValores.value = true
+    try {
+        await configStore.actualizarValores(route.params.id, valoresEdit.value)
+        requerimiento.value = { ...requerimiento.value, valores_adicionales: { ...valoresEdit.value } }
+        editandoValores.value = false
+        toast.add({ severity: 'success', summary: 'Actualizado', detail: 'Campos guardados correctamente', life: 3000 })
+    } catch {
+        toast.add({ severity: 'error', summary: 'Error', detail: 'No se pudieron guardar los cambios', life: 3000 })
+    } finally {
+        guardandoValores.value = false
+    }
+}
+
+// ── Estado del proyecto ───────────────────────────────────────────────────────
+const estadosProyecto         = ref([])
+const nuevoEstadoProyecto     = ref(null)
+const cambiandoEstadoProyecto = ref(false)
+
+async function cambiarEstadoProyecto() {
+    if (!nuevoEstadoProyecto.value) return
+    cambiandoEstadoProyecto.value = true
+    try {
+        const r = await api.patch(`/requerimientos/${route.params.id}/estado-proyecto`, {
+            estado_proyecto: nuevoEstadoProyecto.value
+        })
+        requerimiento.value = r.data
+        toast.add({ severity: 'success', summary: 'Estado de proyecto actualizado', life: 3000 })
+    } catch (err) {
+        toast.add({ severity: 'error', summary: 'Error', detail: err.response?.data?.detail ?? 'No se pudo cambiar el estado', life: 3000 })
+    } finally {
+        cambiandoEstadoProyecto.value = false
+    }
+}
 
 const opcionesEstado = [
     { label: 'En analisis',   value: 'En analisis' },
@@ -92,8 +147,9 @@ async function cargar() {
     error.value   = null
     try {
         const r = await api.get(`/requerimientos/${route.params.id}`)
-        requerimiento.value = r.data
-        nuevoEstado.value   = r.data.estado
+        requerimiento.value       = r.data
+        nuevoEstado.value         = r.data.estado
+        nuevoEstadoProyecto.value = r.data.estado_proyecto ?? null
     } catch (err) {
         error.value = err.response?.status === 404
             ? 'Requerimiento no encontrado.'
@@ -139,7 +195,12 @@ function confirmarArchivar() {
     })
 }
 
-onMounted(cargar)
+onMounted(async () => {
+    await cargar()
+    if (auth.user?.proyecto_id) {
+        estadosProyecto.value = await configStore.fetchEstados(auth.user.proyecto_id)
+    }
+})
 </script>
 
 <template>
@@ -258,6 +319,54 @@ onMounted(cargar)
         </div>
       </div>
 
+      <!-- Campos adicionales -->
+      <div v-if="auth.user?.proyecto_id" class="bg-white rounded-xl shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+          <div class="flex items-center gap-2 text-base font-semibold text-gray-700">
+            <i class="pi pi-sliders-h text-emerald-600"></i>
+            Campos adicionales
+          </div>
+          <div class="flex gap-2">
+            <template v-if="editandoValores">
+              <Button
+                label="Guardar"
+                icon="pi pi-check"
+                size="small"
+                :loading="guardandoValores"
+                style="background:linear-gradient(135deg,#1e3a8a,#3b82f6);border:none"
+                @click="guardarValores"
+              />
+              <Button
+                label="Cancelar"
+                icon="pi pi-times"
+                size="small"
+                severity="secondary"
+                outlined
+                :disabled="guardandoValores"
+                @click="editandoValores = false"
+              />
+            </template>
+            <Button
+              v-else-if="puedeEditarValores"
+              label="Editar"
+              icon="pi pi-pencil"
+              size="small"
+              severity="secondary"
+              outlined
+              @click="abrirEdicionValores"
+            />
+          </div>
+        </div>
+        <div class="p-6">
+          <CamposConfigurables
+            :proyecto-id="auth.user.proyecto_id"
+            :model-value="editandoValores ? valoresEdit : (requerimiento.valores_adicionales ?? {})"
+            :readonly="!editandoValores"
+            @update:model-value="onUpdateValores"
+          />
+        </div>
+      </div>
+
       <!-- Historial en timeline vertical -->
       <div v-if="requerimiento.historial?.length" class="bg-white rounded-xl shadow-sm overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-100">
@@ -326,6 +435,32 @@ onMounted(cargar)
                 @click="cambiarEstado"
               />
             </div>
+          </div>
+
+          <!-- Estado del proyecto -->
+          <div v-if="estadosProyecto.length" class="border-t border-gray-100 pt-5">
+            <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-3">Estado del proyecto</p>
+            <div class="flex gap-3 items-center">
+              <Select
+                v-model="nuevoEstadoProyecto"
+                :options="estadosProyecto.map(e => ({ label: e.nombre, value: e.nombre }))"
+                option-label="label"
+                option-value="value"
+                placeholder="Seleccionar estado"
+                show-clear
+                class="flex-1"
+              />
+              <Button
+                label="Guardar"
+                icon="pi pi-check"
+                :loading="cambiandoEstadoProyecto"
+                :disabled="!nuevoEstadoProyecto || nuevoEstadoProyecto === requerimiento.estado_proyecto"
+                @click="cambiarEstadoProyecto"
+              />
+            </div>
+            <p v-if="requerimiento.estado_proyecto" class="text-xs text-gray-400 mt-2">
+              Estado actual: <span class="font-medium">{{ requerimiento.estado_proyecto }}</span>
+            </p>
           </div>
 
           <!-- Archivar -->
