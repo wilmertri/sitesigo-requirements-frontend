@@ -3,8 +3,10 @@ import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useToast } from 'primevue/usetoast'
 import { useThemeStore } from '../stores/theme'
+import { useAuthStore } from '../stores/auth'
 import api from '../services/api'
 import AppLayout from '../components/AppLayout.vue'
+import CamposConfigurables from '../components/CamposConfigurables.vue'
 import InputText from 'primevue/inputtext'
 import Textarea from 'primevue/textarea'
 import Select from 'primevue/select'
@@ -15,14 +17,16 @@ import Toast from 'primevue/toast'
 const router     = useRouter()
 const toast      = useToast()
 const themeStore = useThemeStore()
+const authStore  = useAuthStore()
 
-const titulo      = ref('')
-const descripcion = ref('')
-const tipo        = ref(null)
-const prioridad   = ref(null)
-const loading     = ref(false)
-const errorMsg    = ref('')
-const errors      = ref({})
+const titulo              = ref('')
+const descripcion         = ref('')
+const tipo                = ref(null)
+const prioridad           = ref(null)
+const valoresAdicionales  = ref({})
+const loading             = ref(false)
+const errorMsg            = ref('')
+const errors              = ref({})
 
 const opcionesTipo = [
     { label: 'Bug',                    value: 'Bug' },
@@ -53,10 +57,11 @@ async function crear() {
     loading.value = true
     try {
         await api.post('/requerimientos', {
-            titulo:      titulo.value.trim(),
-            descripcion: descripcion.value.trim(),
-            tipo:        tipo.value,
-            prioridad:   prioridad.value,
+            titulo:               titulo.value.trim(),
+            descripcion:          descripcion.value.trim(),
+            tipo:                 tipo.value,
+            prioridad:            prioridad.value,
+            valores_adicionales:  valoresAdicionales.value,
         })
         toast.add({ severity: 'success', summary: 'Creado', detail: 'Requerimiento creado correctamente', life: 2500 })
         setTimeout(() => router.push('/dashboard'), 800)
@@ -196,6 +201,18 @@ async function crear() {
                 <small v-if="errors.prioridad" class="text-red-500 text-xs">{{ errors.prioridad }}</small>
               </div>
             </div>
+          </div>
+
+          <!-- Sección 3: Campos adicionales -->
+          <div v-if="authStore.user?.proyecto_id" class="mb-8">
+            <div class="flex items-center gap-2 mb-5">
+              <div class="w-1 h-5 rounded-full" style="background:#10b981"></div>
+              <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Campos adicionales</h2>
+            </div>
+            <CamposConfigurables
+              :proyecto-id="authStore.user.proyecto_id"
+              v-model="valoresAdicionales"
+            />
           </div>
 
           <!-- Error servidor -->
