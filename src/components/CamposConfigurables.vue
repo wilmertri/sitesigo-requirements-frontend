@@ -1,9 +1,10 @@
 <script setup>
-import { ref, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useConfigStore } from '../stores/config'
 import { useThemeStore } from '../stores/theme'
 import InputText from 'primevue/inputtext'
 import InputNumber from 'primevue/inputnumber'
+import Textarea from 'primevue/textarea'
 import Select from 'primevue/select'
 import ProgressSpinner from 'primevue/progressspinner'
 
@@ -11,6 +12,7 @@ const props = defineProps({
     proyectoId: { type: [Number, String], required: true },
     modelValue: { type: Object,  default: () => ({}) },
     readonly:   { type: Boolean, default: false },
+    exclude:    { type: Array,   default: () => [] },
 })
 
 const emit = defineEmits(['update:modelValue'])
@@ -59,6 +61,11 @@ async function recalcular() {
     }
 }
 
+// ── Campos visibles (filtra los excluidos) ────────────────────────────────────
+const camposVisibles = computed(() =>
+    campos.value.filter(c => !props.exclude.includes(c.clave))
+)
+
 // ── Helpers v-model ───────────────────────────────────────────────────────────
 function get(clave)        { return props.modelValue?.[clave] ?? null }
 function set(clave, valor) { emit('update:modelValue', { ...props.modelValue, [clave]: valor }) }
@@ -89,12 +96,12 @@ const inputFechaStyle = () =>
   </div>
 
   <!-- Sin campos configurados -->
-  <div v-else-if="!campos.length" />
+  <div v-else-if="!camposVisibles.length" />
 
   <!-- Campos -->
   <div v-else class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
     <div
-      v-for="campo in campos"
+      v-for="campo in camposVisibles"
       :key="campo.clave"
       class="flex flex-col gap-1.5"
       :class="campo.tipo === 'texto' ? 'sm:col-span-2 md:col-span-4' : ''"
@@ -108,13 +115,23 @@ const inputFechaStyle = () =>
 
       <!-- TEXTO -->
       <template v-if="campo.tipo === 'texto'">
-        <InputText
-          v-if="!readonly"
-          :value="get(campo.clave) ?? ''"
-          @input="set(campo.clave, $event.target.value)"
-          fluid
-        />
-        <p v-else :class="themeStore.isDark ? 'text-slate-300' : 'text-gray-700'" class="text-sm">
+        <template v-if="!readonly">
+          <Textarea
+            v-if="campo.clave === 'observaciones'"
+            :value="get(campo.clave) ?? ''"
+            @input="set(campo.clave, $event.target.value)"
+            :rows="3"
+            fluid
+            :auto-resize="false"
+          />
+          <InputText
+            v-else
+            :value="get(campo.clave) ?? ''"
+            @input="set(campo.clave, $event.target.value)"
+            fluid
+          />
+        </template>
+        <p v-else :class="themeStore.isDark ? 'text-slate-300' : 'text-gray-700'" class="text-sm leading-relaxed whitespace-pre-wrap">
           {{ get(campo.clave) || '—' }}
         </p>
       </template>

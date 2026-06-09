@@ -32,5 +32,11 @@ export const useRequirementsStore = defineStore('requirements', () => {
         return response.data
     }
 
-    return { requerimientos, loading, error, filtros, cargarRequerimientos, archivarRequerimiento }
+    function limpiar() {
+        requerimientos.value = []
+        filtros.value = { estado: null, tipo: null, prioridad: null }
+        error.value = null
+    }
+
+    return { requerimientos, loading, error, filtros, cargarRequerimientos, archivarRequerimiento, limpiar }
 })

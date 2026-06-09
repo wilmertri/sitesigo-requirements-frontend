@@ -3,6 +3,7 @@ import { computed, ref, watch, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { useThemeStore } from '../stores/theme'
+import { useRequirementsStore } from '../stores/requirements'
 import api from '../services/api'
 import Button from 'primevue/button'
 import Tag from 'primevue/tag'
@@ -11,6 +12,7 @@ const router     = useRouter()
 const route      = useRoute()
 const authStore  = useAuthStore()
 const themeStore = useThemeStore()
+const reqStore   = useRequirementsStore()
 
 const navItems = computed(() => {
     const items = [
@@ -70,6 +72,7 @@ function isActive(path) {
 }
 
 function handleLogout() {
+    reqStore.limpiar()
     authStore.logout()
     router.push('/login')
 }

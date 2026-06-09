@@ -11,6 +11,7 @@ import api from '../services/api'
 import AppLayout from '../components/AppLayout.vue'
 import CamposConfigurables from '../components/CamposConfigurables.vue'
 import Select from 'primevue/select'
+import Textarea from 'primevue/textarea'
 import Button from 'primevue/button'
 import ProgressSpinner from 'primevue/progressspinner'
 import Message from 'primevue/message'
@@ -61,6 +62,58 @@ async function guardarValores() {
         toast.add({ severity: 'error', summary: 'Error', detail: 'No se pudieron guardar los cambios', life: 3000 })
     } finally {
         guardandoValores.value = false
+    }
+}
+
+// ── Observaciones ─────────────────────────────────────────────────────────────
+const editandoObs  = ref(false)
+const valorObs     = ref('')
+const guardandoObs = ref(false)
+const camposProyecto   = ref([])
+const hayObservaciones = computed(() =>
+    camposProyecto.value.some(c => c.clave === 'observaciones')
+)
+const puedeEditarObs = computed(() => {
+    const req = requerimiento.value
+    if (!req || !hayObservaciones.value) return false
+    const esCreador = (auth.user?.id && req.creado_por)
+        ? auth.user.id === req.creado_por
+        : auth.user?.email === req.autor_email
+    return esCreador && !['Cerrado', 'Rechazado'].includes(req.estado)
+})
+
+function abrirEdicionObs() {
+    valorObs.value    = requerimiento.value?.valores_adicionales?.observaciones ?? ''
+    editandoObs.value = true
+}
+
+async function guardarObs() {
+    guardandoObs.value = true
+    try {
+        await api.patch(`/requerimientos/${route.params.id}/observaciones`, {
+            observaciones: valorObs.value
+        })
+        requerimiento.value = {
+            ...requerimiento.value,
+            valores_adicionales: {
+                ...requerimiento.value.valores_adicionales,
+                observaciones: valorObs.value,
+            }
+        }
+        editandoObs.value = false
+        toast.add({ severity: 'success', summary: 'Observaciones guardadas', life: 3000 })
+    } catch (err) {
+        const status = err.response?.status
+        const detail = err.response?.data?.detail
+        if (status === 403) {
+            toast.add({ severity: 'error', summary: 'Sin permiso', detail: 'Solo el creador puede editar las observaciones', life: 4000 })
+        } else if (status === 422) {
+            toast.add({ severity: 'error', summary: 'No permitido', detail: typeof detail === 'string' ? detail : 'No se pueden editar las observaciones en este estado', life: 4000 })
+        } else {
+            toast.add({ severity: 'error', summary: 'Error', detail: 'No se pudieron guardar las observaciones', life: 3000 })
+        }
+    } finally {
+        guardandoObs.value = false
     }
 }
 
@@ -198,7 +251,12 @@ function confirmarArchivar() {
 onMounted(async () => {
     await cargar()
     if (auth.user?.proyecto_id) {
-        estadosProyecto.value = await configStore.fetchEstados(auth.user.proyecto_id)
+        const [estados, campos] = await Promise.all([
+            configStore.fetchEstados(auth.user.proyecto_id),
+            configStore.fetchCampos(auth.user.proyecto_id),
+        ])
+        estadosProyecto.value = estados
+        camposProyecto.value  = campos
     }
 })
 </script>
@@ -320,50 +378,82 @@ onMounted(async () => {
       </div>
 
       <!-- Campos adicionales -->
-      <div v-if="auth.user?.proyecto_id" class="bg-white rounded-xl shadow-sm overflow-hidden">
-        <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-          <div class="flex items-center gap-2 text-base font-semibold text-gray-700">
-            <i class="pi pi-sliders-h text-emerald-600"></i>
+      <div v-if="auth.user?.proyecto_id" class="rounded-xl shadow-sm overflow-hidden"
+           :class="themeStore.isDark ? 'bg-slate-800' : 'bg-white'">
+
+        <!-- Header -->
+        <div class="px-6 py-4 border-b flex items-center justify-between"
+             :class="themeStore.isDark ? 'border-slate-700' : 'border-gray-100'">
+          <div class="flex items-center gap-2 text-base font-semibold"
+               :class="themeStore.isDark ? 'text-slate-200' : 'text-gray-700'">
+            <i class="pi pi-sliders-h text-emerald-500"></i>
             Campos adicionales
           </div>
-          <div class="flex gap-2">
+          <div v-if="!editandoObs" class="flex gap-2">
             <template v-if="editandoValores">
-              <Button
-                label="Guardar"
-                icon="pi pi-check"
-                size="small"
-                :loading="guardandoValores"
-                style="background:linear-gradient(135deg,#1e3a8a,#3b82f6);border:none"
-                @click="guardarValores"
-              />
-              <Button
-                label="Cancelar"
-                icon="pi pi-times"
-                size="small"
-                severity="secondary"
-                outlined
-                :disabled="guardandoValores"
-                @click="editandoValores = false"
-              />
+              <Button label="Guardar" icon="pi pi-check" size="small"
+                      :loading="guardandoValores"
+                      style="background:linear-gradient(135deg,#1e3a8a,#3b82f6);border:none"
+                      @click="guardarValores" />
+              <Button label="Cancelar" icon="pi pi-times" size="small"
+                      severity="secondary" outlined :disabled="guardandoValores"
+                      @click="editandoValores = false" />
             </template>
-            <Button
-              v-else-if="puedeEditarValores"
-              label="Editar"
-              icon="pi pi-pencil"
-              size="small"
-              severity="secondary"
-              outlined
-              @click="abrirEdicionValores"
-            />
+            <Button v-else-if="puedeEditarValores"
+                    label="Editar" icon="pi pi-pencil" size="small"
+                    severity="secondary" outlined
+                    @click="abrirEdicionValores" />
           </div>
         </div>
-        <div class="p-6">
+
+        <div class="p-6 flex flex-col gap-5">
+
+          <!-- Observaciones — sección dedicada con edición para el creador -->
+          <div v-if="hayObservaciones">
+            <div class="flex items-center justify-between mb-2">
+              <p class="text-xs font-medium uppercase tracking-wide"
+                 :class="themeStore.isDark ? 'text-slate-400' : 'text-gray-400'">
+                Observaciones
+              </p>
+              <div v-if="editandoObs" class="flex gap-2">
+                <Button label="Guardar" icon="pi pi-check" size="small"
+                        :loading="guardandoObs"
+                        style="background:linear-gradient(135deg,#1e3a8a,#3b82f6);border:none"
+                        @click="guardarObs" />
+                <Button label="Cancelar" icon="pi pi-times" size="small"
+                        severity="secondary" outlined :disabled="guardandoObs"
+                        @click="editandoObs = false" />
+              </div>
+              <Button v-else-if="puedeEditarObs && !editandoValores"
+                      label="Editar observaciones" icon="pi pi-pencil"
+                      size="small" severity="secondary" outlined
+                      @click="abrirEdicionObs" />
+            </div>
+
+            <Textarea
+              v-if="editandoObs"
+              v-model="valorObs"
+              :rows="4"
+              fluid
+              :auto-resize="false"
+              placeholder="Ingresa las observaciones…"
+            />
+            <div v-else
+                 class="min-h-[3rem] rounded-lg px-3 py-2 text-sm leading-relaxed whitespace-pre-wrap"
+                 :class="themeStore.isDark ? 'bg-slate-900 text-slate-300' : 'bg-slate-50 text-gray-700'">
+              {{ requerimiento.valores_adicionales?.observaciones || '—' }}
+            </div>
+          </div>
+
+          <!-- Resto de campos (excluye observaciones para no mostrarla dos veces) -->
           <CamposConfigurables
             :proyecto-id="auth.user.proyecto_id"
             :model-value="editandoValores ? valoresEdit : (requerimiento.valores_adicionales ?? {})"
             :readonly="!editandoValores"
+            :exclude="hayObservaciones ? ['observaciones'] : []"
             @update:model-value="onUpdateValores"
           />
+
         </div>
       </div>
 
