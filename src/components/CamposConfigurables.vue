@@ -92,12 +92,12 @@ const inputFechaStyle = () =>
   <div v-else-if="!campos.length" />
 
   <!-- Campos -->
-  <div v-else class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+  <div v-else class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
     <div
       v-for="campo in campos"
       :key="campo.clave"
       class="flex flex-col gap-1.5"
-      :class="['texto', 'calculado'].includes(campo.tipo) ? 'sm:col-span-2' : ''"
+      :class="campo.tipo === 'texto' ? 'sm:col-span-2 md:col-span-4' : ''"
     >
 
       <!-- Label -->
