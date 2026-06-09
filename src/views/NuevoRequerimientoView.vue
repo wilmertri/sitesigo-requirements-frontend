@@ -88,126 +88,120 @@ async function crear() {
     <Button
       icon="pi pi-arrow-left"
       text rounded size="small" severity="secondary"
-      class="mb-6"
+      class="mb-5"
       @click="router.push('/dashboard')"
     />
 
-    <div class="max-w-2xl mx-auto">
-      <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
-
-        <!-- Card header -->
-        <div
-          :class="themeStore.isDark ? 'bg-slate-700' : ''"
-          :style="themeStore.isDark ? '' : 'background:linear-gradient(135deg,#f8fafc,#f0f4ff)'"
-          class="px-8 py-6 border-b border-gray-100"
-        >
-          <div class="flex items-center gap-4">
-            <div
-              class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
-              :style="themeStore.isDark ? 'background:#1e3a8a' : 'background:#0f2557'"
-            >
-              <i class="pi pi-file-plus text-white text-xl"></i>
-            </div>
-            <div>
-              <h1 :class="themeStore.isDark ? 'text-white' : 'text-gray-800'" class="text-xl font-bold">
-                Nuevo Requerimiento
-              </h1>
-              <p :class="themeStore.isDark ? 'text-slate-300' : 'text-gray-500'" class="text-sm mt-0.5">
-                Completa los campos para registrar el requerimiento
-              </p>
-            </div>
+    <div
+      class="rounded-2xl shadow-lg overflow-hidden"
+      :class="themeStore.isDark ? 'bg-slate-800' : 'bg-white'"
+    >
+      <!-- Card header -->
+      <div
+        class="px-6 py-5 border-b"
+        :class="themeStore.isDark ? 'bg-slate-700 border-slate-600' : 'border-gray-100'"
+        :style="themeStore.isDark ? '' : 'background:linear-gradient(135deg,#f8fafc,#f0f4ff)'"
+      >
+        <div class="flex items-center gap-4">
+          <div
+            class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+            :style="themeStore.isDark ? 'background:#1e3a8a' : 'background:#0f2557'"
+          >
+            <i class="pi pi-file-plus text-white text-lg"></i>
+          </div>
+          <div>
+            <h1 :class="themeStore.isDark ? 'text-white' : 'text-gray-800'" class="text-lg font-bold">
+              Nuevo Requerimiento
+            </h1>
+            <p :class="themeStore.isDark ? 'text-slate-400' : 'text-gray-500'" class="text-xs mt-0.5">
+              Completa los campos para registrar el requerimiento
+            </p>
           </div>
         </div>
+      </div>
 
-        <!-- Form body -->
-        <form @submit.prevent="crear" class="p-8">
+      <!-- Form body -->
+      <form @submit.prevent="crear" class="p-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
-          <!-- Sección 1: Información básica -->
-          <div class="mb-8">
-            <div class="flex items-center gap-2 mb-5">
-              <div class="w-1 h-5 rounded-full" style="background:#0f2557"></div>
-              <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Información básica</h2>
-            </div>
-
-            <div class="flex flex-col gap-5">
-              <div class="flex flex-col gap-1.5">
-                <label class="text-xs font-medium text-gray-500 uppercase tracking-wide">
-                  Título <span class="text-red-500">*</span>
-                </label>
-                <InputText
-                  v-model="titulo"
-                  placeholder="Describe brevemente el requerimiento"
-                  fluid
-                  :invalid="!!errors.titulo"
-                  maxlength="200"
-                />
-                <small v-if="errors.titulo" class="text-red-500 text-xs">{{ errors.titulo }}</small>
-              </div>
-
-              <div class="flex flex-col gap-1.5">
-                <label class="text-xs font-medium text-gray-500 uppercase tracking-wide">
-                  Descripción <span class="text-red-500">*</span>
-                </label>
-                <Textarea
-                  v-model="descripcion"
-                  placeholder="Explica con detalle el requerimiento, contexto e impacto esperado…"
-                  :rows="5"
-                  fluid
-                  :invalid="!!errors.descripcion"
-                  :auto-resize="false"
-                />
-                <small v-if="errors.descripcion" class="text-red-500 text-xs">{{ errors.descripcion }}</small>
-              </div>
-            </div>
+          <!-- Titulo — ancho completo -->
+          <div class="sm:col-span-2 flex flex-col gap-1.5">
+            <label class="text-xs font-medium uppercase tracking-wide"
+                   :class="themeStore.isDark ? 'text-slate-400' : 'text-gray-500'">
+              Título <span class="text-red-500">*</span>
+            </label>
+            <InputText
+              v-model="titulo"
+              placeholder="Describe brevemente el requerimiento"
+              fluid
+              :invalid="!!errors.titulo"
+              maxlength="200"
+            />
+            <small v-if="errors.titulo" class="text-red-500 text-xs">{{ errors.titulo }}</small>
           </div>
 
-          <!-- Sección 2: Clasificación -->
-          <div class="mb-8">
-            <div class="flex items-center gap-2 mb-5">
-              <div class="w-1 h-5 rounded-full" style="background:#3b82f6"></div>
-              <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Clasificación</h2>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div class="flex flex-col gap-1.5">
-                <label class="text-xs font-medium text-gray-500 uppercase tracking-wide">
-                  Tipo <span class="text-red-500">*</span>
-                </label>
-                <Select
-                  v-model="tipo"
-                  :options="opcionesTipo"
-                  option-label="label"
-                  option-value="value"
-                  placeholder="Seleccionar tipo"
-                  fluid
-                  :invalid="!!errors.tipo"
-                />
-                <small v-if="errors.tipo" class="text-red-500 text-xs">{{ errors.tipo }}</small>
-              </div>
-
-              <div class="flex flex-col gap-1.5">
-                <label class="text-xs font-medium text-gray-500 uppercase tracking-wide">
-                  Prioridad <span class="text-red-500">*</span>
-                </label>
-                <Select
-                  v-model="prioridad"
-                  :options="opcionesPrioridad"
-                  option-label="label"
-                  option-value="value"
-                  placeholder="Seleccionar prioridad"
-                  fluid
-                  :invalid="!!errors.prioridad"
-                />
-                <small v-if="errors.prioridad" class="text-red-500 text-xs">{{ errors.prioridad }}</small>
-              </div>
-            </div>
+          <!-- Tipo -->
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-medium uppercase tracking-wide"
+                   :class="themeStore.isDark ? 'text-slate-400' : 'text-gray-500'">
+              Tipo <span class="text-red-500">*</span>
+            </label>
+            <Select
+              v-model="tipo"
+              :options="opcionesTipo"
+              option-label="label"
+              option-value="value"
+              placeholder="Seleccionar tipo"
+              fluid
+              :invalid="!!errors.tipo"
+            />
+            <small v-if="errors.tipo" class="text-red-500 text-xs">{{ errors.tipo }}</small>
           </div>
 
-          <!-- Sección 3: Campos adicionales -->
-          <div v-if="authStore.user?.proyecto_id" class="mb-8">
-            <div class="flex items-center gap-2 mb-5">
-              <div class="w-1 h-5 rounded-full" style="background:#10b981"></div>
-              <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Campos adicionales</h2>
+          <!-- Prioridad -->
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-medium uppercase tracking-wide"
+                   :class="themeStore.isDark ? 'text-slate-400' : 'text-gray-500'">
+              Prioridad <span class="text-red-500">*</span>
+            </label>
+            <Select
+              v-model="prioridad"
+              :options="opcionesPrioridad"
+              option-label="label"
+              option-value="value"
+              placeholder="Seleccionar prioridad"
+              fluid
+              :invalid="!!errors.prioridad"
+            />
+            <small v-if="errors.prioridad" class="text-red-500 text-xs">{{ errors.prioridad }}</small>
+          </div>
+
+          <!-- Descripcion — ancho completo -->
+          <div class="sm:col-span-2 flex flex-col gap-1.5">
+            <label class="text-xs font-medium uppercase tracking-wide"
+                   :class="themeStore.isDark ? 'text-slate-400' : 'text-gray-500'">
+              Descripción <span class="text-red-500">*</span>
+            </label>
+            <Textarea
+              v-model="descripcion"
+              placeholder="Explica con detalle el requerimiento, contexto e impacto esperado…"
+              :rows="4"
+              fluid
+              :invalid="!!errors.descripcion"
+              :auto-resize="false"
+            />
+            <small v-if="errors.descripcion" class="text-red-500 text-xs">{{ errors.descripcion }}</small>
+          </div>
+
+          <!-- Campos adicionales — el componente maneja su grid interna -->
+          <div v-if="authStore.user?.proyecto_id" class="sm:col-span-2 border-t pt-4"
+               :class="themeStore.isDark ? 'border-slate-600' : 'border-gray-100'">
+            <div class="flex items-center gap-2 mb-4">
+              <div class="w-1 h-4 rounded-full" style="background:#10b981"></div>
+              <h2 class="text-xs font-semibold uppercase tracking-wider"
+                  :class="themeStore.isDark ? 'text-slate-400' : 'text-gray-500'">
+                Campos adicionales
+              </h2>
             </div>
             <CamposConfigurables
               :proyecto-id="authStore.user.proyecto_id"
@@ -216,20 +210,13 @@ async function crear() {
           </div>
 
           <!-- Error servidor -->
-          <Message v-if="errorMsg" severity="error" :closable="false" class="mb-6">
+          <Message v-if="errorMsg" severity="error" :closable="false" class="sm:col-span-2">
             {{ errorMsg }}
           </Message>
 
-          <!-- Acciones -->
-          <div class="flex gap-3 pt-4 border-t border-gray-100">
-            <Button
-              label="Crear Requerimiento"
-              icon="pi pi-plus"
-              type="submit"
-              :loading="loading"
-              class="flex-1"
-              style="background:linear-gradient(135deg,#1e3a8a,#3b82f6);border:none"
-            />
+          <!-- Acciones — alineadas a la derecha -->
+          <div class="sm:col-span-2 flex justify-end gap-3 pt-4 border-t"
+               :class="themeStore.isDark ? 'border-slate-600' : 'border-gray-100'">
             <Button
               label="Cancelar"
               icon="pi pi-times"
@@ -238,9 +225,17 @@ async function crear() {
               :disabled="loading"
               @click="router.push('/dashboard')"
             />
+            <Button
+              label="Crear Requerimiento"
+              icon="pi pi-plus"
+              type="submit"
+              :loading="loading"
+              style="background:linear-gradient(135deg,#1e3a8a,#3b82f6);border:none"
+            />
           </div>
-        </form>
-      </div>
+
+        </div>
+      </form>
     </div>
   </AppLayout>
 </template>
